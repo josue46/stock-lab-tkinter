@@ -1,0 +1,462 @@
+from tkinter import *
+from tkinter import ttk
+from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
+import sqlite3 as sq
+from src.categorie import Categories
+import sys
+
+from src.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
+from xlsw import inventory_excel_file
+
+class MainWindow:
+    def __init__(self):
+        self.root = Tk()        
+        self.root.wm_state(newstate="zoomed")
+        self.root.title("Gestion des produits chez Mepal")
+        self.root.iconbitmap("icon/icone.ico")
+        self.root.config(background="#23222e")
+        self.by = StringVar()
+        self.nom_cat = StringVar()
+        self.id_cat = StringVar()
+        self.recherche = StringVar()
+        self.id_prod = StringVar()
+        self.name_prod = StringVar()
+        self.state_prod = StringVar()
+        self.quantity = StringVar()
+        self.price = StringVar()
+        self.categorie = StringVar()
+        self.create_frame_for_product_list()
+        self.create_frame_for_categorie_list()
+        self.create_frame_for_adding_categorie()        
+    
+    def show(self):
+        for prod in self.tree.get_children():
+            self.tree.delete(prod)
+        for produit in get_all():
+            self.tree.tag_configure('orow', font=('verdana', 10), background="#fff")
+            self.tree.insert('', 'end', values=produit, tag='orow')
+    
+    def create_frame_for_product_list(self):        
+        self.colonnes = ("id", "nom", "quantite", "etat_stock", "id_categorie", "prix")     # les colonnes à afficher dans le tableau
+        self.frame = Frame(self.root, bd=0, bg="#d0d3dd")
+        self.frame.place(x=5, y=10, width=1275, height=400)
+        Label(self.frame, text="TABLEAU DES PRODUITS", font=("ms reference sans serif", 16), bg="#d0d3dd").place(x=5, y=5)
+                
+        # champ de recherche        
+        search_field = Entry(self.frame, textvariable=self.recherche, font=("verdana", 10))
+        search_field.place(x=880, y=5, width=170, height=28)
+        
+        # label rechercher par
+        Label(self.frame, text="RECHERCHER PAR:", background="#d0d3dd", font=("ms reference sans serif", 10, "bold")).place(x=530, y=10)
+
+        # bouton recherche
+        btn_search = Button(self.frame, text='Rechercher', width=10, command=self.search)
+        btn_search.place(x=1060, y=5, width=90, height=28)
+        search_by= ttk.Combobox(self.frame, textvariable=self.by, font=("verdana", 10), state="readonly", values=("", "catégorie", "nom du produit"))
+        search_by.place(x=670, y=5, width=200, height=28)
+        search_by.current(0)
+
+        # bouton pour afficher tous les informations
+        btn_info = Button(self.frame, text=' Tout afficher', width=10, command=self.show)
+        btn_info.place(x=1160, y=5, width=90, height=28)
+        
+        # Bouton d'ajout, de modification et de suppression d'un produit
+        btn_del = Button(self.frame, text="Supprimer un produit",  command=self.delete_product_view)
+        btn_del.place(x=775 , y=358, width=150, height=33)
+        btn_update = Button(self.frame, text="Modifier un produit",  command=self.update_product_view)
+        btn_update.place(x=935 , y=358, width=150, height=33)
+        btn_add = Button(self.frame, text="Ajouter un produit",  command=self.register_product_view)
+        btn_add.place(x=1095 , y=358, width=150, height=33)
+        
+        # bouton pour générer un fichier excel de l'inventaire des produits
+        btn_excel = Button(self.frame, text='Télécharger un fichier excel des produits', command=inventory_excel_file)
+        btn_excel.place(x=15, y=358, height=33)
+
+        # scrollbar vertical et tableau
+        self.tree = ttk.Treeview(self.frame, columns=self.colonnes, show='headings', selectmode='browse')
+        self.scrollY = ttk.Scrollbar(self.frame, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=self.scrollY.set)
+        
+        # configuration du tableau pour afficher la liste de tous les produits       
+        self.scrollY.pack(side=RIGHT, fill=Y)
+        self.tree.column("#0", width=0, stretch=NO)
+        self.tree.column('id', width=20, anchor=S)
+        self.tree.column("nom", width=100, anchor=S)
+        self.tree.column("quantite", width=50, anchor=S)
+        self.tree.column("etat_stock", width=100, anchor=S)
+        self.tree.column("id_categorie", width=50, anchor=S)
+        self.tree.column("prix", width=50, anchor=S)
+
+        self.tree.heading('id', text='Identifiant', anchor=S)
+        self.tree.heading('nom', text='Nom du produit', anchor=S)
+        self.tree.heading('quantite', text='Quantité en stock', anchor=S)
+        self.tree.heading('etat_stock', text='Etat du stock', anchor=S)
+        self.tree.heading('id_categorie', text='Catégorie', anchor=S)
+        self.tree.heading('prix', text='Prix', anchor=S)
+        
+        self.tree.place(x=8, y=40, height=310, width=1232)
+        for e in self.tree.get_children():
+            self.tree.delete(e)
+        for product in get_all():
+            self.tree.insert('', 'end', values=product, tag="orow")
+    
+        self.tree.tag_configure('orow', font=('verdana', 10), background="#fff")
+        self.tree.bind("<ButtonRelease-1>", self.get_products_info)
+    
+    def delete_product_view(self):
+        self.win_sup = Toplevel(self.root)
+        self.win_sup.title("Chez Mepal")
+        self.win_sup.geometry("540x410+380+160")
+        self.win_sup.iconbitmap("icon/icone.ico")
+        self.win_sup.resizable(False, False)
+        self.win_sup.config(background="#d0d3dd")
+        
+        lable_principal = Label(self.win_sup, text="Suppression des produits", fg="#fff", bg="#333", font=("arial", 18))
+        lable_principal.place(x=0, y=0, width=540, height=90)
+
+        # LABEL POUR L'IDENTIFIANT DU PRODUIT
+        label1 = Label(self.win_sup, text="N° Identifiant", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label1.place(x=220, y=170)
+        sup_entry = Entry(self.win_sup, textvariable=self.id_prod, bd=1, font=("verdana", 10))
+        sup_entry.place(x=165, y=210, width=240, height=28)
+        
+        
+        # Bouton supprimer
+        btn_sup = Button(self.win_sup, text="Supprimer", bg="red", fg="#fff", bd=0, command=self.delete, font=("ms reference sans serif", 11))
+        btn_sup.place(x=180 , y=315, width=200, height=33)
+    
+    
+    def delete(self):
+        if str(self.id_prod.get()) == "" or str(self.id_prod.get()) == " ":
+            showwarning('Attention', "Le champ n° identifiant est requis pour supprimer", parent=self.win_sup)
+        else:
+            res = askyesno("Notice", "Vous êtes entrain de supprimer ce produit. Voulez-vous continuer ?", parent=self.win_sup)
+            if res:
+                delete_product(self.id_prod.get())
+                self.rafraichir()              
+                # vider les champs de saisi
+                self.reinitialize()
+                showinfo('succès', "Produit supprimé", parent=self.win_sup)
+            else:
+                pass
+    
+    def register_product_view(self):
+        self.win_create = Toplevel(self.root)        
+        self.win_create.title("Chez Mepal")
+        self.win_create.geometry("670x450+380+160")
+        self.win_create.iconbitmap("icon/icone.ico")
+        self.win_create.resizable(False, False)
+        self.win_create.config(background="#d0d3dd")
+        
+        lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#333", font=("arial", 18))
+        lable_principal.place(x=0, y=0, width=670, height=90)
+
+        # LABEL POUR LES DONNEES DU PRODUIT
+        label1 = Label(self.win_create, text="Nom:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label1.place(x=60, y=120)
+        name_entry = Entry(self.win_create, textvariable=self.name_prod, bd=1, font=("verdana", 10))
+        name_entry.place(x=215, y=120, width=240, height=28)
+        
+        label2 = Label(self.win_create, text="Quantité:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label2.place(x=60, y=170)
+        quantity_entry = Entry(self.win_create, textvariable=self.quantity, bd=1, font=("verdana", 10))
+        quantity_entry.place(x=215, y=170, width=240, height=28)
+        
+        label3 = Label(self.win_create, text="Prix:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label3.place(x=60, y=214)
+        price_entry = Entry(self.win_create, textvariable=self.price, bd=0, font=("verdana", 10))
+        price_entry.place(x=215, y=214, width=240, height=28)
+        
+        label4 = Label(self.win_create, text="Etat du produit:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label4.place(x=60, y=263)
+        state_entry = ttk.Combobox(self.win_create, textvariable=self.state_prod, font=("verdana", 10))
+        state_entry["values"] = ("en stock", "vide")
+        state_entry["state"] = "readonly"
+        state_entry.current(0)
+        state_entry.place(x=215, y=263, width=240, height=28)
+        
+        label5 = Label(self.win_create, text="Catégorie:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label5.place(x=60, y=310)
+        categorie_entry = ttk.Combobox(self.win_create, textvariable=self.categorie, font=("verdana", 10))
+        categorie_entry["values"] = Categories.getCategories()
+        categorie_entry["state"] = "readonly"        
+        categorie_entry.place(x=215, y=310, width=240, height=28)
+        
+        
+        # Bouton enrégistrer
+        btn_create = Button(self.win_create, text="Enrégister", bg="green", fg="#fff", bd=0, command=self.register, font=("ms reference sans serif", 11))
+        btn_create.place(x=235 , y=385, width=200, height=33)
+
+    
+    def register(self):
+        if str(self.name_prod.get()) == "" or str(self.name_prod.get()) == " ":
+            showwarning("Avertissement", "Entrez un nom pour ce produit", parent=self.win_create)
+        elif str(self.price.get()) == "" or str(self.price.get()) == " ":
+            showerror("Erreur", "Vous avez oublié de mettre un prix pour ce produit. Soit mettez un prix de 0 Fc pour indiquer l'absence du prix", parent=self.win_create)
+        elif str(self.quantity.get()) == "" or str(self.quantity.get()) == " ":
+            showerror("Erreur", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_create)
+        elif str(self.quantity.get()) == '0' and str(self.state_prod.get()) == 'en stock':
+            showwarning("Avertissement", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du stock", parent=self.win_create)
+        elif self.categorie.get() == "":
+            showerror("Erreur", "Vous ne pouvez pas ignorer le champ catégorie", parent=self.win_create)
+        else:
+            categorie = Categories.getIdByName(self.categorie.get())     # recuperation de la categorie selectionnée
+            values = self.name_prod.get(), self.quantity.get(), \
+                    self.state_prod.get(), categorie[0][0], self.price.get()
+            register_product(*values)
+            self.rafraichir()
+            # vider les champs de saisi
+            self.reinitialize()
+            showinfo("Succès", 'Enregistrement éffectué', parent=self.win_create)
+    
+    def update_product_view(self):
+        self.win_update = Toplevel(self.root)
+        self.win_update.title("Chez Mepal")
+        self.win_update.geometry("670x460+380+160")
+        self.win_update.iconbitmap("icon/icone.ico")
+        self.win_update.resizable(False, False)
+        self.win_update.config(background="#d0d3dd")
+        
+        lable_principal = Label(self.win_update, text="Mise à jour des produits", fg="#fff", bg="#333", font=("arial", 18))
+        lable_principal.place(x=0, y=0, width=670, height=90)
+
+        # LABEL POUR LES DONNEES DU PRODUIT
+        label1 = Label(self.win_update, text="Nom:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label1.place(x=60, y=120)
+        name_entry = Entry(self.win_update, textvariable=self.name_prod, bd=1, font=("verdana", 10))
+        name_entry.place(x=215, y=120, width=240, height=28)
+        
+        label2 = Label(self.win_update, text="Quantité:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label2.place(x=60, y=170)
+        quantity_entry = Entry(self.win_update, textvariable=self.quantity, bd=1, font=("verdana", 10))
+        quantity_entry.place(x=215, y=170, width=240, height=28)
+        
+        label3 = Label(self.win_update, text="Prix:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label3.place(x=60, y=214)
+        price_entry = Entry(self.win_update, textvariable=self.price, bd=0, font=("verdana", 10))
+        price_entry.place(x=215, y=214, width=240, height=28)
+        
+        label4 = Label(self.win_update, text="Etat du produit:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label4.place(x=60, y=263)
+        state_entry = ttk.Combobox(self.win_update, textvariable=self.state_prod, font=("verdana", 10))
+        state_entry["values"] = ("en stock", "vide")
+        state_entry["state"] = "readonly"
+        state_entry.current(0)
+        state_entry.place(x=215, y=263, width=240, height=28)
+        
+        label5 = Label(self.win_update, text="Catégorie:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label5.place(x=60, y=310)
+        categorie_entry = ttk.Combobox(self.win_update, textvariable=self.categorie, font=("verdana", 10))
+        categorie_entry["values"] = Categories.getCategories()
+        categorie_entry["state"] = "readonly"
+        categorie_entry.place(x=215, y=310, width=240, height=28)
+        
+        label6 = Label(self.win_update, text="N° identifiant:", font=("ms reference sans serif", 12), bg='#d0d3dd')
+        label6.place(x=60, y=350)
+        id_entry = Entry(self.win_update, textvariable=self.id_prod, font=("verdana", 10))
+        id_entry.place(x=215, y=350, width=240, height=28)
+        
+        
+        # Bouton enrégistrer
+        btn_create = Button(self.win_update, text="Mettre à jour", bg="blue", fg="#fff", bd=0, command=self.update, font=("ms reference sans serif", 11))
+        btn_create.place(x=235 , y=410, width=200, height=33)
+
+    
+    def update(self):        
+        if str(self.id_prod.get()) == "":
+            showwarning("Attention", "Précisez l'identifiant du produit que vous voulez mettre à jour", parent=self.win_update)
+        elif str(self.price.get()) == "" or self.price.get() == '0':
+            showerror("Erreur", "Vous avez oublié de mettre le prix à ce produit ou mettez un prix différent de 0 Fc", parent=self.win_update)
+        elif str(self.quantity.get()) == "" or str(self.quantity.get()) == " ":
+            showerror("Erreur", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_update)
+        elif str(self.quantity.get()) == '0' and str(self.state_prod.get()) == 'en stock':
+            showwarning("Avertissement", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du stock", parent=self.win_update)
+        elif str(self.name_prod.get()) == "":
+            showerror("Erreur", "Vous ne pouvez pas enlever le nom à ce produit", parent=self.win_update)
+        elif self.categorie.get() == "":
+            showerror("Erreur", "Vous ne pouvez pas ignorer le champ catégorie", parent=self.win_update)
+        else:
+            if str(self.state_prod.get()) != "":
+                categorie = Categories.getIdByName(self.categorie.get())     # recuperation du nom de la categorie selectionnee
+                values = self.name_prod.get(), self.quantity.get(), \
+                    self.state_prod.get(), categorie[0][0], self.price.get(), self.id_prod.get()
+                update_product(*values)
+                self.rafraichir()
+                # vider les champs de saisi
+                self.reinitialize()
+                showinfo("Succès", 'Mise à jour éffectuée', parent=self.win_update)                                
+            else:
+                showwarning("Attention", "Mettez à jour au moins un champ des données", parent=self.win_update)
+    
+    
+    def reinitialize(self):
+        self.name_prod.set('')
+        self.price.set('')
+        self.quantity.set('')
+        self.state_prod.set('en stock')
+        self.id_prod.set('')
+        
+                
+    def create_frame_for_categorie_list(self):        
+        self.frame2 = Frame(self.root, bd=2, background="#d0d3dd")
+        self.frame2.place(x=5, y=415, width=700, height=320)
+        Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("ms reference sans serif", 16), bg="#d0d3dd").place(x=5, y=5)
+        
+        # cration du tableau
+        self.tree2 = ttk.Treeview(self.frame2, columns=("id", "nom"), show="headings", selectmode='browse')
+        scroll_y = ttk.Scrollbar(self.frame2, orient='vertical', command=self.tree2.yview)
+        self.tree2.configure(yscrollcommand=scroll_y.set)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        self.tree2.column("#0", width=0, stretch=NO)
+        self.tree2.column("id", width=20, anchor=S)
+        self.tree2.column("nom", width=100, anchor=S)
+        self.tree2.heading("id", text="Identifiant", anchor=S)
+        self.tree2.heading("nom", text="Nom", anchor=S)
+        self.tree2.place(x=8, y=45, width=650)
+        self.tree2.tag_configure('orow', font=('verdana', 11), background="#fff")
+        self.tree2.bind("<ButtonRelease-1>", self.get_categories_info)
+
+        # BOUTON DELETE ET UPDATE
+        self.btn_sup = Button(self.frame2, text="Supprimer la catégorie", command=self.delete_cat)        
+        self.btn_sup.place(x=160, y=280, width=150, height=33)
+        self.btn_modif = Button(self.frame2, text="Modifier la catégorie", command=self.update_cat)
+        self.btn_modif.place(x=330, y=280, width=150, height=33)        
+        
+        # affichage des catégories dans le tableau
+        for c in self.tree2.get_children():
+            self.tree2.delete(c)
+            
+        for categorie in Categories.getAll():
+            self.tree2.insert('', END, values=categorie, tag="orow")            
+            
+    
+    def get_categories_info(self, event):
+            """cette fonction elle récupères tous les données d'une catégories dans le tableau 
+            et le réaffecte
+            dans leurs champs de saisi
+            """
+            ligne_focus = self.tree2.focus()
+            contenus = self.tree2.item(ligne_focus)
+            row = contenus["values"]
+            self.id_cat.set(row[0])
+            self.nom_cat.set(row[1])
+    
+    
+    def get_products_info(self, event):
+            """cette fonction elle récupères tous les données d'un produit dans le tableau 
+            et le réaffecte
+            dans leurs champs de saisi
+            """
+            focus_line = self.tree.focus()
+            contents = self.tree.item(focus_line)
+            rows = contents["values"]
+            prix = str(rows[5]).split(" ")            
+            cat = Categories.getNameById(rows[4])            
+            self.id_prod.set(rows[0])
+            self.name_prod.set(rows[1])
+            self.quantity.set(rows[2])
+            self.state_prod.set(rows[3])
+            self.categorie.set(cat)
+            self.price.set(prix[0])
+
+        
+    def create_frame_for_adding_categorie(self):
+        self.frame3 = Frame(self.root, bd=2, background="#d0d3dd")
+        self.frame3.place(x=710, y=415, width=560, height=320)
+        Label(self.frame3, text="AJOUT DES CATEGORIES", font=("ms reference sans serif", 16), bg="#333", fg="white").place(x=-1.5, y=-1.5, width=560, height=70)
+        
+        # CHAMP NOM DE LA CATEGORIE
+        Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#d0d3dd").place(x=200, y=100)
+        Label(self.frame3, text="N° identifiant", font=("ms reference sans serif", 12), bg="#d0d3dd").place(x=229, y=184)
+        nom = Entry(self.frame3, font=("arial", 11), textvariable=self.nom_cat)
+        nom.place(x=150, y=140, width=290, height=32)
+        idt = Entry(self.frame3, font=("arial", 11), textvariable=self.id_cat)
+        idt.place(x=150, y=220, width=290, height=32)
+        btn_add_cat = Button(self.frame3, text="Ajouter la catégorie", font=("ms reference sans serif", 11), command=self.create_cat)
+        btn_add_cat.place(x=170, y=275, width=250, height=32)
+    
+                
+    def delete_cat(self, event):
+        if self.id_cat.get() != "":
+            response = askyesno("Notice", "Cette opération est irréversible. Tous les produits appartennant à cette catégorie seront aussi supprimé !\nVoulez-vous quand-même supprimer cette catégorie ? ")
+            if response:            
+                Categories.delete_cat_model(self.id_cat.get())                
+                self.rafraichir()
+                self.nom_cat.set("")
+                self.id_cat.set("")
+                showinfo("Succès", "Catégorie supprimée avec succès")                
+            else:
+                pass
+        else:
+            showwarning("Attention", "Vous devez préciser l'identifiant de la catégorie que vous voulez supprimer")
+                
+    
+    def update_cat(self):
+        if self.id_cat.get() == "" or self.id_cat.get() == " ":
+            showwarning("Attention", "Précisez l'identifiant de la catégorie que vous voulez modifier")
+        else:                                    
+            if self.nom_cat.get() != "" and self.nom_cat.get() != " ":
+                Categories.update_cat_model(self.nom_cat.get(), self.id_cat.get())
+                self.rafraichir()
+                self.nom_cat.set("")
+                self.id_cat.set("")
+                showinfo("succès", "Catégorie modifiée succèes")
+            else:
+                showwarning("Attention", "Entrez les nouvelles coordonnées de la catégorie sélectionnée")
+    
+    
+    def rafraichir(self):
+        """
+        Cette fonction rafraichi tous les tableaux après chaque ajout, modification ou suppression
+        de la part de l'utilisateur
+        """
+        self.root.after(1, self.create_frame_for_categorie_list())
+        self.root.after(1, self.create_frame_for_product_list()) 
+    
+    
+    def create_cat(self):
+        if self.nom_cat.get() == "" or self.nom_cat.get() == " ":
+            showwarning("Attention", "Vous devez entrer un nom pour créer une catégorie")
+        elif self.id_cat.get() != "":
+            showerror("erreur", "L'identifiant est géneré automatiquement !")
+        else:
+            Categories.create_cat_model(self.nom_cat.get())
+            self.rafraichir()
+            self.nom_cat.set("")
+            showinfo("succès", "Catégorie créée avec succès")
+    
+    
+    def search(self):
+        if self.by.get() == "nom du produit":
+            if self.recherche.get() == "" or self.recherche.get() == " ":
+                showwarning("Notice", "Entrez le nom du produit que vous voulez rechercher", parent=self.root)
+            else:
+                if len(search_product_by_name(self.recherche.get())) != 0:
+                    for el in self.tree.get_children():
+                        self.tree.delete(el)
+
+                    for row in search_product_by_name(self.recherche.get()):
+                        self.tree.insert('', END, values=row, tag='orow')
+                        self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
+                        self.recherche.set("")
+                else:
+                    showerror("Erreur", "Produit non trouvé", parent=self.root)
+        elif self.by.get() == "catégorie":
+            if self.recherche.get() == "" or self.recherche.get() == " ":
+                showwarning("Notice", "Entrez le nom de la catégorie des produits que vous voulez rechercher", parent=self.root)
+            else:
+                categorie_id = Categories.getIdByName(self.recherche.get().title())
+                if len(search_product_by_categorie(categorie_id[0][0] if not categorie_id == [] else showerror("Erreur", "Catégorie non trouvée", parent=self.root))) != 0:
+                    for el in self.tree.get_children():
+                        self.tree.delete(el)                        
+                    for row in search_product_by_categorie(categorie_id[0][0]):
+                        self.tree.insert('', END, values=row, tag='orow')
+                        self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
+                        self.recherche.set("")
+        else:
+            showerror("Erreur", "Précisez votre recherche en selectionnant le type de recherche dans le champ <RECHERCHER PAR> ", parent=self.root)
+
+
+if __name__ == "__main__":
+    window = MainWindow()
+    window.root.mainloop()
