@@ -12,7 +12,7 @@ class MainWindow:
     def __init__(self):
         self.root = Tk()        
         self.root.wm_state(newstate="zoomed")
-        self.root.title("Gestion des produits chez Mepal")
+        self.root.title("Stock Lab")
         self.root.iconbitmap("icon/icone.ico")
         self.root.config(background="#23222e")
         self.by = StringVar()
@@ -105,7 +105,7 @@ class MainWindow:
     
     def delete_product_view(self):
         self.win_sup = Toplevel(self.root)
-        self.win_sup.title("Chez Mepal")
+        self.win_sup.title("Suppression des produits")
         self.win_sup.geometry("540x410+380+160")
         self.win_sup.iconbitmap("icon/icone.ico")
         self.win_sup.resizable(False, False)
@@ -142,7 +142,7 @@ class MainWindow:
     
     def register_product_view(self):
         self.win_create = Toplevel(self.root)        
-        self.win_create.title("Chez Mepal")
+        self.win_create.title("Enrégistrement des produits")
         self.win_create.geometry("670x450+380+160")
         self.win_create.iconbitmap("icon/icone.ico")
         self.win_create.resizable(False, False)
@@ -211,7 +211,7 @@ class MainWindow:
     
     def update_product_view(self):
         self.win_update = Toplevel(self.root)
-        self.win_update.title("Chez Mepal")
+        self.win_update.title("Mise à jour des produits")
         self.win_update.geometry("670x460+380+160")
         self.win_update.iconbitmap("icon/icone.ico")
         self.win_update.resizable(False, False)
