@@ -4,3 +4,5 @@ le projet a été développé en python avec la librairie Tkinter
 ayant des fonctionnalités comme la recherche des produits par nom ou catégorie de ce dernier.
 ayant aussi une fonctionnalité supplémentaire de conversion de monnaie avec les devises
 comme usd et cdf uniquement.
+
+# créé par Josué Luis Panzu
