@@ -1,20 +1,63 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
-import sqlite3 as sq
-from src.categorie import Categories
-import sys
+from tkinter.font import Font
 
-from src.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
+from models.categorie import Categories
+import os
+
+from models.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
 from xlsw import inventory_excel_file
 
 class MainWindow:
     def __init__(self):
         self.root = Tk()        
         self.root.wm_state(newstate="zoomed")
-        self.root.title("Stock Lab")
+        self.root.title("StockLab")
         self.root.iconbitmap("icon/icone.ico")
-        self.root.config(background="#23222e")
+        self.menu = Menu(self.root)
+        self.root.config(background="#23222e", menu=self.menu)
+
+        # police
+        self.police_header = Font(family="Sitka Heading", size=18, weight="bold")
+
+        # sous-menu fichier
+        file = Menu(self.menu, tearoff=0)
+        file.add_command(label="Bureau de change", command=self.conversion, accelerator="Ctrl+B")
+        file.add_separator()
+        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+Shift+N")
+        file.add_command(label="Fermer la fenêtre", command=self.root.destroy, accelerator="Ctrl+Shift+W")
+        file.add_separator()
+        file.add_command(label="Quitter", command=self.root.quit)
+        self.menu.add_cascade(label="Fichier", menu=file)
+        self.root.bind_all("<Control-Shift-KeyPress-n>", self.new_bind)
+        self.root.bind_all("<Control-Shift-KeyPress-N>", self.new_bind)
+        self.root.bind_all("<Control-KeyPress-b>", self.conversion_bind)
+        self.root.bind_all("<Control-KeyPress-B>", self.conversion_bind)
+        self.root.bind_all("<Control-Shift-KeyPress-W>", self.close)
+        self.root.bind_all("<Control-Shift-KeyPress-w>", self.close)
+
+        # sous-menu thème
+        theme = Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Option", menu=theme)
+
+        # sous-menu color
+        color_menu = Menu(self.menu, tearoff=0)
+        self.color = IntVar()
+        self.color.set(1)
+        color_menu.add_radiobutton(label="<Thème par defaut>", variable=self.color, value=1, command=self.change_theme)
+        color_menu.add_separator()
+        color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)    
+        color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)        
+        color_menu.add_radiobutton(label="vert", variable=self.color, value=4, command=self.change_theme)
+        
+        theme.add_cascade(menu=color_menu, label="Thème")
+        
+        # sous-menu aide
+        aide = Menu(self.menu, tearoff=0)
+        aide.add_command(label="À propos de StockLab", command=self.about)
+        self.menu.add_cascade(label="Aide", menu=aide)
+
         self.by = StringVar()
         self.nom_cat = StringVar()
         self.id_cat = StringVar()
@@ -34,20 +77,23 @@ class MainWindow:
             self.tree.delete(prod)
         for produit in get_all():
             self.tree.tag_configure('orow', font=('verdana', 10), background="#fff")
-            self.tree.insert('', 'end', values=produit, tag='orow')
+            self.tree.insert('', 'end', values=produit, tag='orow')            
     
-    def create_frame_for_product_list(self):        
+    
+    def create_frame_for_product_list(self):
         self.colonnes = ("id", "nom", "quantite", "etat_stock", "prix", "id_categorie")     # les colonnes à afficher dans le tableau
         self.frame = Frame(self.root, bd=0, bg="#8080FF")
-        self.frame.place(x=5, y=10, width=1275, height=400)
-        Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
+        self.frame.place(x=0, y=2, width=1278, height=400)        
+        self.lab_main = Label(self.frame, text="TABLEAU DES PRODUITS", font=self.police_header, bg="#8080FF", fg="white")
+        self.lab_main.place(x=5, y=5)
                 
         # champ de recherche        
         search_field = Entry(self.frame, textvariable=self.recherche, font=("verdana", 10))
         search_field.place(x=880, y=5, width=170, height=28)
         
         # label rechercher par
-        Label(self.frame, text="RECHERCHER PAR:", background="#8080FF", fg="white", font=("ms reference sans serif", 10, "bold")).place(x=530, y=10)
+        self.lbl_search = Label(self.frame, text="RECHERCHER PAR:", background="#8080FF", fg="white", font=("ms reference sans serif", 10, "bold"))
+        self.lbl_search.place(x=530, y=10)
 
         # bouton recherche
         btn_search = Button(self.frame, text='Rechercher', width=10, command=self.search)
@@ -70,12 +116,7 @@ class MainWindow:
         
         # bouton pour générer un fichier excel de l'inventaire des produits
         btn_excel = Button(self.frame, text='Télécharger un fichier excel des produits', bg='#333', fg='#fff',command=inventory_excel_file)
-        btn_excel.place(x=15, y=358, height=33)
-
-        # bouton de conversion dollar
-        btn_conv = Button(self.frame, text="Bureau de change", bg="#3af076", border=None, borderwidth=None)
-        btn_conv.place(x=250, y=358, height=33)
-        btn_conv.config(command=self.conversion)
+        btn_excel.place(x=15, y=358, height=33)        
 
         # scrollbar vertical et tableau
         self.tree = ttk.Treeview(self.frame, columns=self.colonnes, show='headings', selectmode='browse')
@@ -116,13 +157,14 @@ class MainWindow:
         self.win_sup.resizable(False, False)
         self.win_sup.config(background="#0a0b38")
         
-        lable_principal = Label(self.win_sup, text="Suppression des produits", fg="#fff", bg="#b60d2a", font=("consolas", 18))
+        lable_principal = Label(self.win_sup, text="Suppression des produits", fg="#fff", bg="#b60d2a", font=self.police_header)
         lable_principal.place(x=0, y=0, width=500, height=90)
 
         # LABEL POUR L'IDENTIFIANT DU PRODUIT
         label1 = Label(self.win_sup, text="N° Identifiant", font=("ms reference sans serif", 12), bg='#0a0b38', fg="#ffffff")
         label1.place(x=40, y=200)
         sup_entry = Entry(self.win_sup, textvariable=self.id_prod, bd=1, font=("verdana", 10))
+        sup_entry.focus()
         sup_entry.place(x=180, y=200, width=240, height=28)
         
         
@@ -133,7 +175,7 @@ class MainWindow:
     
     def delete(self):
         if str(self.id_prod.get()) == "" or str(self.id_prod.get()) == " ":
-            showwarning('Attention', "Le champ n° identifiant est requis pour supprimer", parent=self.win_sup)
+            showwarning('Attention', "Le champ n° identifiant est requis pour supprimer un produit", parent=self.win_sup)
         else:
             res = askyesno("Notice", "Vous êtes entrain de supprimer ce produit. Voulez-vous continuer ?", parent=self.win_sup)
             if res:                
@@ -152,22 +194,22 @@ class MainWindow:
         self.win_create.iconbitmap("icon/icone.ico")
         self.win_create.resizable(False, False)
         self.win_create.config(background="#0a0b38")
-
-        #121246        
-        lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#49ca74", font=("century gothic", 20))
+        
+        lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#49ca74", font=self.police_header)
         lable_principal.place(x=0, y=0, width=560, height=90)
 
         # LABEL POUR LES DONNEES DU PRODUIT
         label1 = Label(self.win_create, text="Nom:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label1.place(x=40, y=120)
         name_entry = Entry(self.win_create, textvariable=self.name_prod, bd=1, font=("verdana", 10))
+        name_entry.focus()
         name_entry.place(x=180, y=120, width=240, height=28)
         
         label2 = Label(self.win_create, text="Quantité:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label2.place(x=40, y=170)
         quantity_entry = Entry(self.win_create, textvariable=self.quantity, bd=1, font=("verdana", 10))
         quantity_entry.place(x=180, y=170, width=240, height=28)
-        
+
         label3 = Label(self.win_create, text="Prix:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label3.place(x=40, y=214)
         price_entry = Entry(self.win_create, textvariable=self.price, bd=0, font=("verdana", 10))
@@ -223,7 +265,7 @@ class MainWindow:
         self.win_update.resizable(False, False)
         self.win_update.config(background="#0a0b38")
         
-        lable_principal = Label(self.win_update, text="Mise à jour des produits", fg="#fff", bg="#1c9be4", font=("consolas", 18))
+        lable_principal = Label(self.win_update, text="Mise à jour des produits", fg="#fff", bg="#1c9be4", font=self.police_header)
         lable_principal.place(x=0, y=0, width=560, height=90)
 
         # LABEL POUR LES DONNEES DU PRODUIT
@@ -260,6 +302,7 @@ class MainWindow:
         label6 = Label(self.win_update, text="N° identifiant:", font=("ms reference sans serif", 12), bg='#0a0b38', fg="#fff")
         label6.place(x=40, y=350)
         id_entry = Entry(self.win_update, textvariable=self.id_prod, font=("verdana", 10))
+        id_entry.focus()
         id_entry.place(x=180, y=350, width=240, height=28)
         
         
@@ -306,8 +349,9 @@ class MainWindow:
                 
     def create_frame_for_categorie_list(self):        
         self.frame2 = Frame(self.root, bd=2, background="#8080FF")
-        self.frame2.place(x=5, y=415, width=700, height=320)
-        Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
+        self.frame2.place(x=0, y=404, width=705, height=320)
+        self.lbl_cat = Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=self.police_header, bg="#8080FF", fg="white")
+        self.lbl_cat.place(x=5, y=5)
         
         # cration du tableau
         self.tree2 = ttk.Treeview(self.frame2, columns=("id", "nom"), show="headings", selectmode='browse')
@@ -325,9 +369,9 @@ class MainWindow:
 
         # BOUTON DELETE ET UPDATE
         self.btn_sup = Button(self.frame2, text="Supprimer la catégorie", bg='#333', fg='#fff',command=self.delete_cat)    
-        self.btn_sup.place(x=160, y=280, width=150, height=33)
+        self.btn_sup.place(x=160, y=275, width=150, height=30)
         self.btn_modif = Button(self.frame2, text="Modifier la catégorie", command=self.update_cat)
-        self.btn_modif.place(x=330, y=280, width=150, height=33)        
+        self.btn_modif.place(x=330, y=275, width=150, height=30)        
         
         # affichage des catégories dans le tableau
         for c in self.tree2.get_children():
@@ -368,18 +412,22 @@ class MainWindow:
         
     def create_frame_for_adding_categorie(self):
         self.frame3 = Frame(self.root, bd=2, background="#8080FF")
-        self.frame3.place(x=710, y=415, width=560, height=320)
-        Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white").place(x=-1.5, y=-1.5, width=560, height=70)
+        self.frame3.place(x=708, y=404, width=571, height=320)
+        self.lbl_add_cat = Label(self.frame3, text="AJOUT DES CATEGORIES", font=self.police_header, bg="#000", fg="white")
+        self.lbl_add_cat.place(x=-1.5, y=-1.5, width=571, height=70)
         
         # CHAMP NOM DE LA CATEGORIE
-        Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF").place(x=200, y=100)
-        Label(self.frame3, text="N° identifiant", font=("ms reference sans serif", 12), bg="#8080FF").place(x=229, y=184)
+        self.lb_name_cat = Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF")
+        self.lb_name_cat.place(x=200, y=100)
+        self.lb_id_cat = Label(self.frame3, text="N° identifiant", font=("ms reference sans serif", 12), bg="#8080FF")
+        self.lb_id_cat.place(x=229, y=184)
         nom = Entry(self.frame3, font=("arial", 11), textvariable=self.nom_cat)
         nom.place(x=150, y=140, width=290, height=32)
+        nom.focus()
         idt = Entry(self.frame3, font=("arial", 11), textvariable=self.id_cat)
         idt.place(x=150, y=220, width=290, height=32)
         btn_add_cat = Button(self.frame3, text="Ajouter la catégorie", font=("ms reference sans serif", 11), command=self.create_cat)
-        btn_add_cat.place(x=170, y=275, width=250, height=32)
+        btn_add_cat.place(x=170, y=270, width=250, height=32)
     
                 
     def delete_cat(self):
@@ -396,8 +444,8 @@ class MainWindow:
                 pass
         else:
             showwarning("Attention", "Vous devez préciser l'identifiant de la catégorie que vous voulez supprimer")
-                
-    
+
+
     def update_cat(self):
         if self.id_cat.get() == "" or self.id_cat.get() == " ":
             showwarning("Attention", "Précisez l'identifiant de la catégorie que vous voulez modifier")
@@ -470,7 +518,7 @@ class MainWindow:
     
 
     def conversion(self):
-        self.c = Toplevel(self.root)
+        self.c = Toplevel()
         self.c.title("Convertissez votre monnaie")
         self.c.geometry("340x410+380+160")
         self.c.iconbitmap("icon/icone.ico")        
@@ -485,6 +533,7 @@ class MainWindow:
 
         Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=100)
         self.entree1 = Entry(self.cframe, font=("verdana", 11))
+        self.entree1.focus()
         self.entree1.place(x=50, y=130, width=240, height=25)
 
         Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
@@ -539,8 +588,137 @@ class MainWindow:
                     showinfo('', 'Choississez une devise', parent=self.c)
 
         self.c.bind("<Return>", convert_b)
-        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)       
+        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)
+    
+    
+    def conversion_bind(self, event):
+        self.c = Toplevel()
+        self.c.title("Convertissez votre monnaie")
+        self.c.geometry("340x410+380+160")
+        self.c.iconbitmap("icon/icone.ico")        
+        self.cframe = Frame(self.c, bg='#0a0b38')
+        self.cframe.place(x=0, y=0, width=340, height=410)
+        self.e2 = StringVar()
 
+        Label(self.cframe, text="Devise", font=("verdana", 12), bg='#0a0b38', fg='#fff').place(x=0, y=10)
+        self.devise = ttk.Combobox(self.cframe, values=("franc", "dollar"), state='readonly')
+        self.devise.place(x=60, y=12, width=60)
+        self.devise.current(1)
+
+        Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=100)
+        self.entree1 = Entry(self.cframe, font=("verdana", 11))
+        self.entree1.focus()
+        self.entree1.place(x=50, y=130, width=240, height=25)
+
+        Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
+        self.entree2 = Entry(self.cframe, textvariable=self.e2, font=("verdana", 11))
+        self.entree2.place(x=50, y=240, width=240, height=25)
+        Label(self.cframe, text="Taux= 2465", font=("sans serif", 8), bg='#0a0b38', fg='#fff').place(x=50, y=280)
+
+        def convert_b(event):
+            e1 = self.entree1.get()
+            taux = 2465
+            r = None
+
+            match(self.devise.get()):
+                case('franc'):
+                    if e1 != '':
+                        r = int(float(e1)) / taux
+                        self.e2.set(f'{r} $')
+                    else:
+                        showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                case('dollar'):
+                    if e1 != '':
+                        r = int(float(e1)) * taux
+                        self.e2.set(f'{r} fc')
+                    else:
+                        showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)                    
+                case _:
+                    showinfo('', 'Choississez une devise', parent=self.c)
+
+        def convert():
+            e1 = self.entree1.get()
+            r = None
+            taux = 2465
+
+            match(self.devise.get()):
+                case('franc'):
+                    if r is None:
+                        if e1 != "":
+                            r = int(float(e1)) / taux
+                            self.e2.set(f'{r} $')
+                        else:
+                            showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                case('dollar'):
+                    if r is None:
+                        if e1 != '':
+                            r = int(float(e1)) * taux
+                            self.e2.set(f'{r} fc')
+                        else:
+                            showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                    # Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#000', fg='#fff').place(x=100, y=100)
+                    # Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#333', fg='#fff').place(x=100, y=210)
+                case _:
+                    showinfo('', 'Choississez une devise', parent=self.c)
+
+        self.c.bind("<Return>", convert_b)
+        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)
+    
+    
+    def new(self):
+        os.popen("main.py")
+    
+    def new_bind(self, event):
+        os.popen("main.py")
+    
+    
+    def change_theme(self):
+        theme_value = self.color.get()
+        match (theme_value):    
+            case(2):
+                self.frame["bg"] = "grey"
+                self.lab_main["bg"] = "grey"
+                self.lbl_search["bg"] = "grey"
+                self.frame2["background"] = "grey"
+                self.lbl_cat["bg"] = "grey"
+                self.frame3["background"] = "grey"
+                self.lb_name_cat["bg"] = "grey"
+                self.lb_id_cat["bg"] = "grey"
+            case(3):
+                self.frame["bg"] = "purple"
+                self.lab_main["bg"] = "purple"
+                self.lbl_search["bg"] = "purple"
+                self.frame2["background"] = "purple"
+                self.lbl_cat["bg"] = "purple"
+                self.frame3["background"] = "purple"
+                self.lb_name_cat["bg"] = "purple"
+                self.lb_id_cat["bg"] = "purple"
+            case(4):
+                self.frame["bg"] = "#04805a"
+                self.lab_main["bg"] = "#04805a"
+                self.lbl_search["bg"] = "#04805a"
+                self.frame2["background"] = "#04805a"
+                self.lbl_cat["bg"] = "#04805a"
+                self.frame3["background"] = "#04805a"
+                self.lb_name_cat["bg"] = "#04805a"
+                self.lb_id_cat["bg"] = "#04805a"                
+            case _:
+                self.frame["bg"] = "#8080FF"
+                self.lab_main["bg"] = "#8080FF"
+                self.lbl_search["bg"] = "#8080FF"
+                self.frame2["background"] = "#8080FF"
+                self.lbl_cat["bg"] = "#8080FF"
+                self.frame3["background"] = "#8080FF"
+                self.lb_name_cat["bg"] = "#8080FF"
+                self.lb_id_cat["bg"] = "#8080FF"
+    
+    def about(self):
+        showinfo("À propos de StockLab", "StockLab", detail="\r\nVersion: 2.3.14\r\nAuteur: Josué Luis Panzu\r\nDescription: Stock Lab est une application open source de gestion de stockage\r\nSystème: Windows x64 Linux MacOS\r\n\nCopyright © 2023 Walborn Inc.")
+
+    def close(self, e):
+        self.root.destroy()
+        
+        
 if __name__ == "__main__":
     window = MainWindow()
     window.root.mainloop()

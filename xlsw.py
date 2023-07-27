@@ -1,7 +1,7 @@
 import locale
 import xlsxwriter as xls
-from src.product import get_all
-from src.categorie import Categories
+from models.product import get_all
+from models.categorie import Categories
 from datetime import datetime
 from tkinter.messagebox import showinfo, showwarning
 
@@ -55,4 +55,4 @@ def inventory_excel_file():
             showinfo("Téléchargement réussi", "Le fichier excel a été téléchargé dans le dossier actuel")
     else:
         # si téléchargement échoué, envoyer ce message
-        showwarning("Téléchargement échoué", "Aucune donnée n'a été téléchargé car le tableau des produits est vide")
+        showwarning("Téléchargement échoué", "Aucune donnée n'a été téléchargée car le tableau des produits est vide")
