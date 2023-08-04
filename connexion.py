@@ -12,5 +12,5 @@ with s.connect("stock.db") as connexion:
 		PRIMARY KEY("id" AUTOINCREMENT)
 		); """)
 	
-	cursor.execute(""" CREATE TABLE IF NOT EXISTS products ("id" INTEGER, "nom" TEXT NOT NULL, "quantite" INTEGER, "etat_stock"	TEXT NOT NULL, "id_categorie" INTEGER NOT NULL, "prix" INTEGER,
-		PRIMARY KEY("id" AUTOINCREMENT), FOREIGN KEY("id_categorie") REFERENCES categories("id") ); """)
+	cursor.execute(""" CREATE TABLE IF NOT EXISTS products ("id" INTEGER, "nom" TEXT NOT NULL, "quantite" INTEGER, "etat_stock"	TEXT NOT NULL, "id_categorie" TEXT NOT NULL, "prix" INTEGER,
+		PRIMARY KEY("id" AUTOINCREMENT), FOREIGN KEY("id_categorie") REFERENCES categories("nom") ); """)
