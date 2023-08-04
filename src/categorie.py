@@ -59,15 +59,16 @@ class Categories:
     
     
     @staticmethod
-    def delete_cat_model(i: int): 
+    def delete_cat_model(i: int, n: str):
         try:
-            with s.connect("stock.db") as connexion:                
+            with s.connect("stock.db") as connexion:             
                 c = connexion.cursor()
                 c.execute("DELETE FROM categories WHERE id=?", (i, ))
-                c.execute("DELETE FROM products WHERE id_categorie=?", (i, ))
-                connexion.commit()                                
+                c.execute("DELETE FROM products WHERE id_categorie=?", (n, ))
+                connexion.commit()
         except s.OperationalError as e:
             print(e)
+            connexion.rollback()
         finally:
             connexion.close()
     
@@ -103,7 +104,7 @@ class Categories:
         """
         selectionner en fonction de l'id de la categorie
         """
-        categorie = None     
+        categorie = None
         try:           
             with s.connect("stock.db") as connexion:
                 # Enregistrer
@@ -120,3 +121,29 @@ class Categories:
             connexion.close()
         
         return categorie[0][0]
+
+
+    @staticmethod
+    def get_name_of_categorie(name):
+        """
+        selectionner le nom en fonction du nom de la categorie
+        """
+        name_categorie = None
+        try:           
+            with s.connect("stock.db") as connexion:
+                # Enregistrer
+                cursor = connexion.cursor()
+                q = "SELECT nom FROM categories WHERE nom=?"
+                cursor.execute(q, (name, ))
+                name_categorie = cursor.fetchall()             
+
+        except s.OperationalError as e:
+            print('une erreur est survenue')
+            print(e)
+        
+        finally:
+            connexion.close()
+        
+        return name_categorie
+
+print(Categories.get_name_of_categorie("Produit osmétique"))
