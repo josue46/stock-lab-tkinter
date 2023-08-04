@@ -15,12 +15,12 @@ def delete_product(i):
         connexion.close()
 
 
-def update_product(name: str, quantity: int, state: str, id_categorie: int, prix: int, idd: int):
+def update_product(name: str, quantity: int, state: str, id_cat: int, prix: int, idd: int):
     try:
         with sq.connect("stock.db") as connexion:            
             c = connexion.cursor()
-            query = """ UPDATE products SET nom='{}', quantite={}, etat_stock='{}', id_categorie={}, prix='{}' WHERE id={} """
-            c.execute(query.format(str(name).title(), quantity, str(state), id_categorie, int(prix), idd ))
+            query = """ UPDATE products SET nom='{}', quantite={}, etat_stock='{}', id_categorie='{}', prix='{}' WHERE id={} """
+            c.execute(query.format(str(name).title(), quantity, str(state), str(id_cat), int(prix), idd ))
     except sq.OperationalError as error:
         print("Une erreur est survenu lors de la modification du produit")
         print(error)
