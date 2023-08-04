@@ -73,7 +73,7 @@ class MainWindow:
         btn_excel.place(x=15, y=358, height=33)
 
         # bouton de conversion dollar
-        btn_conv = Button(self.frame, text='Conversion dollar', bg="#3af076", border=None)
+        btn_conv = Button(self.frame, text="Bureau de change", bg="#3af076", border=None, borderwidth=None)
         btn_conv.place(x=250, y=358, height=33)
         btn_conv.config(command=self.conversion)
 
@@ -136,7 +136,7 @@ class MainWindow:
             showwarning('Attention', "Le champ n° identifiant est requis pour supprimer", parent=self.win_sup)
         else:
             res = askyesno("Notice", "Vous êtes entrain de supprimer ce produit. Voulez-vous continuer ?", parent=self.win_sup)
-            if res:
+            if res:                
                 delete_product(self.id_prod.get())
                 self.rafraichir()              
                 # vider les champs de saisi
@@ -196,19 +196,19 @@ class MainWindow:
     
     def register(self):
         if str(self.name_prod.get()) == "" or str(self.name_prod.get()) == " ":
-            showwarning("Avertissement", "Entrez un nom pour ce produit", parent=self.win_create)
+            showwarning("Rappel", "Entrez un nom pour ce produit", parent=self.win_create)
         elif str(self.price.get()) == "" or str(self.price.get()) == " ":
-            showerror("Erreur", "Vous avez oublié de mettre un prix pour ce produit. Soit mettez un prix de 0 Fc pour indiquer l'absence du prix", parent=self.win_create)
+            showwarning("Rappel", "Vous avez oublié de mettre un prix pour ce produit. Soit mettez un prix de 0 Fc pour indiquer l'absence du prix", parent=self.win_create)
         elif str(self.quantity.get()) == "" or str(self.quantity.get()) == " ":
-            showerror("Erreur", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_create)
+            showinfo("Rappel", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_create)
         elif str(self.quantity.get()) == '0' and str(self.state_prod.get()) == 'en stock':
-            showwarning("Avertissement", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du stock", parent=self.win_create)
+            showerror("Erreur", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du produit", parent=self.win_create)
         elif self.categorie.get() == "":
-            showerror("Erreur", "Vous ne pouvez pas ignorer le champ catégorie", parent=self.win_create)
+            showinfo("Rappel", "Attribuez une catégorie à ce produit en selectionnant une dans le champ catégorie", parent=self.win_create)
         else:
             categorie = Categories.getIdByName(self.categorie.get())     # recuperation de la categorie selectionnée
             values = self.name_prod.get(), self.quantity.get(), \
-                    self.state_prod.get(), categorie[0][0], self.price.get()
+                    self.state_prod.get(), categorie[0][1], self.price.get()
             register_product(*values)
             self.rafraichir()
             # vider les champs de saisi
@@ -272,20 +272,21 @@ class MainWindow:
         if str(self.id_prod.get()) == "":
             showwarning("Attention", "Précisez l'identifiant du produit que vous voulez mettre à jour", parent=self.win_update)
         elif str(self.price.get()) == "" or self.price.get() == '0':
-            showerror("Erreur", "Vous avez oublié de mettre le prix à ce produit ou mettez un prix différent de 0 Fc", parent=self.win_update)
+            showinfo("Rappel", "Vous avez oublié de mettre le prix à ce produit ou mettez un prix différent de 0 Fc", parent=self.win_update)
         elif str(self.quantity.get()) == "" or str(self.quantity.get()) == " ":
-            showerror("Erreur", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_update)
+            showinfo("Rappel", "Précisez une quantité pour ce produit. Vous pouvez mettre 0 pour une quantité vide", parent=self.win_update)
         elif str(self.quantity.get()) == '0' and str(self.state_prod.get()) == 'en stock':
-            showwarning("Avertissement", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du stock", parent=self.win_update)
+            showerror("Erreur", "Le produit ne peut pas être en stock pendant que sa quantité est 0. Modifiez l'état du produit", parent=self.win_update)
         elif str(self.name_prod.get()) == "":
             showerror("Erreur", "Vous ne pouvez pas enlever le nom à ce produit", parent=self.win_update)
         elif self.categorie.get() == "":
-            showerror("Erreur", "Vous ne pouvez pas ignorer le champ catégorie", parent=self.win_update)
+            showinfo("Rappel", "Attribuez une catégorie à ce produit en selectionnant une dans le champ catégorie", parent=self.win_update)
         else:
             if str(self.state_prod.get()) != "":
-                categorie = Categories.getIdByName(self.categorie.get())     # recuperation du nom de la categorie selectionnee
+                icategorie = Categories.getIdByName(self.categorie.get())[0][0]     # recuperation du nom de la categorie selectionnee
+                n_cat = Categories.getNameById(icategorie)
                 values = self.name_prod.get(), self.quantity.get(), \
-                    self.state_prod.get(), categorie[0][0], self.price.get(), self.id_prod.get()
+                    self.state_prod.get(), str(n_cat), self.price.get(), self.id_prod.get()
                 update_product(*values)
                 self.rafraichir()
                 # vider les champs de saisi
@@ -357,12 +358,11 @@ class MainWindow:
             contents = self.tree.item(focus_line)
             rows = contents["values"]
             prix = str(rows[5]).split(" ")            
-            cat = Categories.getNameById(rows[4])            
             self.id_prod.set(rows[0])
             self.name_prod.set(rows[1])
             self.quantity.set(rows[2])
             self.state_prod.set(rows[3])
-            self.categorie.set(cat)
+            self.categorie.set(rows[4])
             self.price.set(prix[0])
 
         
@@ -385,12 +385,13 @@ class MainWindow:
     def delete_cat(self):
         if self.id_cat.get() != "":
             response = askyesno("Notice", "Cette opération est irréversible. Tous les produits appartennant à cette catégorie seront aussi supprimé !\nVoulez-vous quand-même supprimer cette catégorie ? ")
-            if response:            
-                Categories.delete_cat_model(self.id_cat.get())                
+            if response:
+                name_cat_from_prod = Categories.getNameById(self.id_cat.get())
+                Categories.delete_cat_model(self.id_cat.get(), name_cat_from_prod)
                 self.rafraichir()
                 self.nom_cat.set("")
                 self.id_cat.set("")
-                showinfo("Succès", "Catégorie supprimée avec succès")                
+                showinfo("Succès", "Catégorie supprimée avec succès")          
             else:
                 pass
         else:
@@ -446,16 +447,16 @@ class MainWindow:
                         self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
                         self.recherche.set("")
                 else:
-                    showerror("Erreur", "Produit non trouvé", parent=self.root)
+                    showinfo("Not found", "Produit non trouvé", parent=self.root)
         elif self.by.get() == "catégorie":
             if self.recherche.get() == "" or self.recherche.get() == " ":
                 showwarning("Notice", "Entrez le nom de la catégorie des produits que vous voulez rechercher", parent=self.root)
             else:
-                categorie_id = Categories.getIdByName(self.recherche.get().title())
-                if len(search_product_by_categorie(categorie_id[0][0] if not categorie_id == [] else showerror("Erreur", "Catégorie non trouvée", parent=self.root))) != 0:
+                categorie_name = Categories.get_name_of_categorie(self.recherche.get().title())               
+                if len(search_product_by_categorie(categorie_name[0][0] if not categorie_name == [] else showinfo("Not found", "Catégorie non trouvée", parent=self.root))) != 0:
                     for el in self.tree.get_children():
                         self.tree.delete(el)                        
-                    for row in search_product_by_categorie(categorie_id[0][0]): 
+                    for row in search_product_by_categorie(categorie_name[0][0]):
                         self.tree.insert('', END, values=row, tag='orow')
                         self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
                         self.recherche.set("")
