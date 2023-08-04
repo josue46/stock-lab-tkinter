@@ -19,7 +19,7 @@ def update_product(name: str, quantity: int, state: str, id_categorie: int, prix
     try:
         with sq.connect("stock.db") as connexion:            
             c = connexion.cursor()
-            query = """ UPDATE products SET nom='{}', quantite={}, etat_stock='{}', id_categorie={}, prix='{} Fc' WHERE id={} """
+            query = """ UPDATE products SET nom='{}', quantite={}, etat_stock='{}', id_categorie={}, prix='{}' WHERE id={} """
             c.execute(query.format(str(name).title(), quantity, str(state), id_categorie, int(prix), idd ))
     except sq.OperationalError as error:
         print("Une erreur est survenu lors de la modification du produit")
