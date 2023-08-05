@@ -40,7 +40,7 @@ def inventory_excel_file():
         prods = get_all()
         if not prods == []:
             for prod in prods:
-                categorie_name = Categories.getNameById(prod[4])
+                categorie_name = Categories.get_name_of_categorie(prod[4])[0][0]
                 worksheet.write(f"A{pos}", prod[0])
                 worksheet.write(f"B{pos}", prod[1])
                 worksheet.write(f"C{pos}", prod[2])
