@@ -452,14 +452,19 @@ class MainWindow:
             if self.recherche.get() == "" or self.recherche.get() == " ":
                 showwarning("Notice", "Entrez le nom de la catégorie des produits que vous voulez rechercher", parent=self.root)
             else:
-                categorie_name = Categories.get_name_of_categorie(self.recherche.get().title())               
-                if len(search_product_by_categorie(categorie_name[0][0] if not categorie_name == [] else showinfo("Not found", "Catégorie non trouvée", parent=self.root))) != 0:
-                    for el in self.tree.get_children():
-                        self.tree.delete(el)                        
-                    for row in search_product_by_categorie(categorie_name[0][0]):
-                        self.tree.insert('', END, values=row, tag='orow')
-                        self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
-                        self.recherche.set("")
+                categorie_name = Categories.get_name_of_categorie(self.recherche.get().title())
+                if categorie_name != []:                   
+                    if len(search_product_by_categorie(categorie_name[0][0])) != 0:
+                        for el in self.tree.get_children():
+                            self.tree.delete(el)                        
+                        for row in search_product_by_categorie(categorie_name[0][0]):
+                            self.tree.insert('', END, values=row, tag='orow')
+                            self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
+                            self.recherche.set("")
+                    else:
+                        showinfo("Not found", "Aucun produit n'est associé à cette catégorie", parent=self.root)
+                else: 
+                    showinfo("Not found", "Catégorie non trouvée", parent=self.root)               
         else:
             showerror("Erreur", "Précisez votre recherche en selectionnant le type de recherche dans le champ <RECHERCHER PAR> ", parent=self.root)
     
