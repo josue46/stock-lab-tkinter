@@ -485,21 +485,23 @@ class MainWindow:
         Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
         self.entree2 = Entry(self.cframe, textvariable=self.e2, font=("verdana", 11))
         self.entree2.place(x=50, y=240, width=240, height=25)
-        Label(self.cframe, text="Taux= 2432", font=("sans serif", 8), bg='#0a0b38', fg='#fff').place(x=50, y=280)
+        Label(self.cframe, text="Taux= 2465", font=("sans serif", 8), bg='#0a0b38', fg='#fff').place(x=50, y=280)
 
         def convert_b(event):
             e1 = self.entree1.get()
+            taux = 2465
+            r = None
 
             match(self.devise.get()):
                 case('franc'):
                     if e1 != '':
-                        r = int(float(e1)) / 2432
+                        r = int(float(e1)) / taux
                         self.e2.set(f'{r} $')
                     else:
                         showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
                 case('dollar'):
                     if e1 != '':
-                        r = int(float(e1)) * 2432
+                        r = int(float(e1)) * taux
                         self.e2.set(f'{r} fc')
                     else:
                         showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)                    
@@ -509,19 +511,20 @@ class MainWindow:
         def convert():
             e1 = self.entree1.get()
             r = None
+            taux = 2465
 
             match(self.devise.get()):
                 case('franc'):
                     if r is None:
                         if e1 != "":
-                            r = int(float(e1)) / 2432
+                            r = int(float(e1)) / taux
                             self.e2.set(f'{r} $')
                         else:
                             showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
                 case('dollar'):
                     if r is None:
                         if e1 != '':
-                            r = int(float(e1)) * 2432
+                            r = int(float(e1)) * taux
                             self.e2.set(f'{r} fc')
                         else:
                             showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
