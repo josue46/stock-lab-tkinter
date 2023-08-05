@@ -403,7 +403,7 @@ class MainWindow:
             showwarning("Attention", "Précisez l'identifiant de la catégorie que vous voulez modifier")
         else:                                    
             if self.nom_cat.get() != "" and self.nom_cat.get() != " ":
-                Categories.update_cat_model(self.nom_cat.get(), self.id_cat.get())
+                Categories.update_cat_model(self.nom_cat.get().strip(), self.id_cat.get())
                 self.rafraichir()
                 self.nom_cat.set("")
                 self.id_cat.set("")
