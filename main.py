@@ -207,8 +207,8 @@ class MainWindow:
             showinfo("Rappel", "Attribuez une catégorie à ce produit en selectionnant une dans le champ catégorie", parent=self.win_create)
         else:
             categorie = Categories.getIdByName(self.categorie.get())     # recuperation de la categorie selectionnée
-            values = self.name_prod.get(), self.quantity.get(), \
-                    self.state_prod.get(), categorie[0][1], self.price.get()
+            values = self.name_prod.get().strip(), self.quantity.get().strip(), \
+                    self.state_prod.get().strip(), categorie[0][1], self.price.get().strip()
             register_product(*values)
             self.rafraichir()
             # vider les champs de saisi
@@ -285,8 +285,8 @@ class MainWindow:
             if str(self.state_prod.get()) != "":
                 icategorie = Categories.getIdByName(self.categorie.get())         # recuperation du nom de la categorie selectionnee
                 n_cat = Categories.getNameById(int(icategorie[0][0]))
-                values = self.name_prod.get(), self.quantity.get(), \
-                    self.state_prod.get(), str(n_cat), self.price.get(), self.id_prod.get()
+                values = self.name_prod.get().strip(), self.quantity.get().strip(), \
+                    self.state_prod.get(), str(n_cat), self.price.get().strip(), self.id_prod.get().strip()
                 update_product(*values)
                 self.rafraichir()
                 # vider les champs de saisi
@@ -427,7 +427,7 @@ class MainWindow:
         elif self.id_cat.get() != "":
             showerror("erreur", "L'identifiant est géneré automatiquement !")
         else:
-            Categories.create_cat_model(self.nom_cat.get())
+            Categories.create_cat_model(self.nom_cat.get().strip())
             self.rafraichir()
             self.nom_cat.set("")
             showinfo("succès", "Catégorie créée avec succès")
