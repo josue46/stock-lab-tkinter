@@ -78,7 +78,7 @@ class Categories:
         try:
             with s.connect("stock.db") as connexion:
                 cur = connexion.cursor()
-                cur.execute("UPDATE categories SET nom='{0}' WHERE id={1}".format(str(n).title(), i))
+                cur.execute("UPDATE categories SET nom='{0}' WHERE id={1}".format(str(n).title(), i))                
                 connexion.commit()
         except s.OperationalError as e:
             print(e)
@@ -145,5 +145,3 @@ class Categories:
             connexion.close()
         
         return name_categorie
-
-print(Categories.get_name_of_categorie("Produit osmétique"))
