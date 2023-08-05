@@ -94,7 +94,7 @@ def search_product_by_name(name: str):
     return rows
         
         
-def search_product_by_categorie(cat: int):
+def search_product_by_categorie(cat: str):
     try:
         with sq.connect("stock.db") as connexion:
             cur = connexion.cursor()
