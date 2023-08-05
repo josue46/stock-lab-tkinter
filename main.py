@@ -438,7 +438,7 @@ class MainWindow:
             if self.recherche.get() == "" or self.recherche.get() == " ":
                 showwarning("Notice", "Entrez le nom du produit que vous voulez rechercher", parent=self.root)
             else:
-                if len(search_product_by_name(self.recherche.get())) != 0:
+                if len(search_product_by_name(str(self.recherche.get()))) != 0:
                     for el in self.tree.get_children():
                         self.tree.delete(el)
 
