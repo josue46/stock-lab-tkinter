@@ -37,7 +37,7 @@ class MainWindow:
             self.tree.insert('', 'end', values=produit, tag='orow')
     
     def create_frame_for_product_list(self):        
-        self.colonnes = ("id", "nom", "quantite", "etat_stock", "id_categorie", "prix")     # les colonnes à afficher dans le tableau
+        self.colonnes = ("id", "nom", "quantite", "etat_stock", "prix", "id_categorie")     # les colonnes à afficher dans le tableau
         self.frame = Frame(self.root, bd=0, bg="#8080FF")
         self.frame.place(x=5, y=10, width=1275, height=400)
         Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
@@ -89,15 +89,15 @@ class MainWindow:
         self.tree.column("nom", width=100, anchor=S)
         self.tree.column("quantite", width=50, anchor=S)
         self.tree.column("etat_stock", width=100, anchor=S)
-        self.tree.column("id_categorie", width=50, anchor=S)
         self.tree.column("prix", width=50, anchor=S)
+        self.tree.column("id_categorie", width=50, anchor=S)
 
         self.tree.heading('id', text='Identifiant', anchor=S)
         self.tree.heading('nom', text='Nom du produit', anchor=S)
         self.tree.heading('quantite', text='Quantité en stock', anchor=S)
         self.tree.heading('etat_stock', text='Etat du stock', anchor=S)
-        self.tree.heading('id_categorie', text='Catégorie', anchor=S)
         self.tree.heading('prix', text='Prix', anchor=S)
+        self.tree.heading('id_categorie', text='Catégorie', anchor=S)
         
         self.tree.place(x=8, y=40, height=310, width=1232)
         for e in self.tree.get_children():
