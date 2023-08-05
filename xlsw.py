@@ -41,12 +41,12 @@ def inventory_excel_file():
         
             pos = 2
             for prod in prods:
-                categorie_name = Categories.get_name_of_categorie(prod[4])[0][0]
+                categorie_name = Categories.get_name_of_categorie(prod[5])[0][0]
                 worksheet.write(f"A{pos}", prod[0])
                 worksheet.write(f"B{pos}", prod[1])
                 worksheet.write(f"C{pos}", prod[2])
                 worksheet.write(f"D{pos}", prod[3])
-                worksheet.write(f"E{pos}", prod[5])
+                worksheet.write(f"E{pos}", prod[4])
                 worksheet.write(f"F{pos}", categorie_name)
                 
                 pos +=1
