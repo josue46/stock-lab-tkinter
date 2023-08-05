@@ -438,11 +438,11 @@ class MainWindow:
             if self.recherche.get() == "" or self.recherche.get() == " ":
                 showwarning("Notice", "Entrez le nom du produit que vous voulez rechercher", parent=self.root)
             else:
-                if len(search_product_by_name(str(self.recherche.get()))) != 0:
+                if len(search_product_by_name(self.recherche.get().title())) != 0:
                     for el in self.tree.get_children():
                         self.tree.delete(el)
 
-                    for row in search_product_by_name(self.recherche.get()):
+                    for row in search_product_by_name(self.recherche.get().title()):
                         self.tree.insert('', END, values=row, tag='orow')
                         self.tree.tag_configure('orow', font=('verdana', 10), background='#fff')
                         self.recherche.set("")
@@ -464,7 +464,7 @@ class MainWindow:
                     else:
                         showinfo("Not found", "Aucun produit n'est associé à cette catégorie", parent=self.root)
                 else: 
-                    showinfo("Not found", "Catégorie non trouvée", parent=self.root)               
+                    showinfo("Not found", "Catégorie non trouvée", parent=self.root)            
         else:
             showerror("Erreur", "Précisez votre recherche en selectionnant le type de recherche dans le champ <RECHERCHER PAR> ", parent=self.root)
     
