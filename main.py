@@ -283,8 +283,8 @@ class MainWindow:
             showinfo("Rappel", "Attribuez une catégorie à ce produit en selectionnant une dans le champ catégorie", parent=self.win_update)
         else:
             if str(self.state_prod.get()) != "":
-                icategorie = Categories.getIdByName(self.categorie.get())[0][0]     # recuperation du nom de la categorie selectionnee
-                n_cat = Categories.getNameById(icategorie)
+                icategorie = Categories.getIdByName(self.categorie.get())         # recuperation du nom de la categorie selectionnee
+                n_cat = Categories.getNameById(int(icategorie[0][0]))
                 values = self.name_prod.get(), self.quantity.get(), \
                     self.state_prod.get(), str(n_cat), self.price.get(), self.id_prod.get()
                 update_product(*values)
@@ -357,12 +357,12 @@ class MainWindow:
             focus_line = self.tree.focus()
             contents = self.tree.item(focus_line)
             rows = contents["values"]
-            prix = str(rows[5]).split(" ")            
+            prix = str(rows[4]).split(" ")            
             self.id_prod.set(rows[0])
             self.name_prod.set(rows[1])
             self.quantity.set(rows[2])
             self.state_prod.set(rows[3])
-            self.categorie.set(rows[4])
+            self.categorie.set(rows[5])
             self.price.set(prix[0])
 
         
