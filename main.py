@@ -24,9 +24,10 @@ class MainWindow:
         file.add_command(label="Quitter", command=self.root.destroy)
         self.menu.add_cascade(label="Fichier", menu=file)
         
-        # sous-menu option
-        opt = Menu(self.menu, tearoff=0)
-        opt.add_command(label="Changer le theme", command="")        
+        # sous-menu couleur
+        color = Menu(self.menu, tearoff=0)
+        color.add_command(label="Changer le theme", command="")
+        self.menu.add_cascade(label="Thème", menu=color)
         
         self.by = StringVar()
         self.nom_cat = StringVar()
@@ -52,7 +53,7 @@ class MainWindow:
     def create_frame_for_product_list(self):        
         self.colonnes = ("id", "nom", "quantite", "etat_stock", "prix", "id_categorie")     # les colonnes à afficher dans le tableau
         self.frame = Frame(self.root, bd=0, bg="#8080FF")
-        self.frame.place(x=5, y=10, width=1275, height=400)
+        self.frame.place(x=0, y=2, width=1278, height=400)
         Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
                 
         # champ de recherche        
