@@ -4,6 +4,7 @@ from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
 import sqlite3 as sq
 from src.categorie import Categories
 import sys
+import os
 
 from src.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
 from xlsw import inventory_excel_file
@@ -19,16 +20,19 @@ class MainWindow:
         
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
+        file.add_command(label="Nouvelle fenêtre", command=self.new)
         file.add_command(label="Bureau de change", command=self.conversion)
         file.add_separator()
-        file.add_command(label="Quitter", command=self.root.destroy)
+        file.add_command(label="Quitter", command=quit)
         self.menu.add_cascade(label="Fichier", menu=file)
         
-        # sous-menu couleur
-        color = Menu(self.menu, tearoff=0)
-        color.add_command(label="Changer le theme", command="")
-        self.menu.add_cascade(label="Thème", menu=color)
-        
+        color = IntVar()
+        # sous-menu thème
+        theme = Menu(self.menu, tearoff=0)
+        theme.add_checkbutton(label="Gris", command="", variable=color)
+        theme.add_checkbutton(label="Violet", command="", variable=color)
+        self.menu.add_cascade(label="Thèmes", menu=theme)
+
         self.by = StringVar()
         self.nom_cat = StringVar()
         self.id_cat = StringVar()
@@ -548,7 +552,11 @@ class MainWindow:
                     showinfo('', 'Choississez une devise', parent=self.c)
 
         self.c.bind("<Return>", convert_b)
-        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)       
+        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)
+    
+    
+    def new(self):
+        os.popen("main.py")
 
 if __name__ == "__main__":
     window = MainWindow()
