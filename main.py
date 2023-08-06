@@ -14,7 +14,20 @@ class MainWindow:
         self.root.wm_state(newstate="zoomed")
         self.root.title("Stock Lab")
         self.root.iconbitmap("icon/icone.ico")
-        self.root.config(background="#23222e")
+        self.menu = Menu(self.root)
+        self.root.config(background="#23222e", menu=self.menu)
+        
+        # sous-menu fichier
+        file = Menu(self.menu, tearoff=0)
+        file.add_command(label="Bureau de change", command=self.conversion)
+        file.add_separator()
+        file.add_command(label="Quitter", command=self.root.destroy)
+        self.menu.add_cascade(label="Fichier", menu=file)
+        
+        # sous-menu option
+        opt = Menu(self.menu, tearoff=0)
+        opt.add_command(label="Changer le theme", command="")        
+        
         self.by = StringVar()
         self.nom_cat = StringVar()
         self.id_cat = StringVar()
@@ -70,12 +83,7 @@ class MainWindow:
         
         # bouton pour générer un fichier excel de l'inventaire des produits
         btn_excel = Button(self.frame, text='Télécharger un fichier excel des produits', bg='#333', fg='#fff',command=inventory_excel_file)
-        btn_excel.place(x=15, y=358, height=33)
-
-        # bouton de conversion dollar
-        btn_conv = Button(self.frame, text="Bureau de change", bg="#3af076", border=None, borderwidth=None)
-        btn_conv.place(x=250, y=358, height=33)
-        btn_conv.config(command=self.conversion)
+        btn_excel.place(x=15, y=358, height=33)        
 
         # scrollbar vertical et tableau
         self.tree = ttk.Treeview(self.frame, columns=self.colonnes, show='headings', selectmode='browse')
@@ -396,8 +404,8 @@ class MainWindow:
                 pass
         else:
             showwarning("Attention", "Vous devez préciser l'identifiant de la catégorie que vous voulez supprimer")
-                
-    
+
+
     def update_cat(self):
         if self.id_cat.get() == "" or self.id_cat.get() == " ":
             showwarning("Attention", "Précisez l'identifiant de la catégorie que vous voulez modifier")
