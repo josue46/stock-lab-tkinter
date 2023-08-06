@@ -17,7 +17,7 @@ class MainWindow:
         self.root.iconbitmap("icon/icone.ico")
         self.menu = Menu(self.root)
         self.root.config(background="#23222e", menu=self.menu)
-        
+
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
         file.add_command(label="Nouvelle fenêtre", command=self.new)
@@ -25,13 +25,24 @@ class MainWindow:
         file.add_separator()
         file.add_command(label="Quitter", command=quit)
         self.menu.add_cascade(label="Fichier", menu=file)
-        
-        color = IntVar()
+
         # sous-menu thème
-        theme = Menu(self.menu, tearoff=0)
-        theme.add_checkbutton(label="Gris", command="", variable=color)
-        theme.add_checkbutton(label="Violet", command="", variable=color)
+        theme = Menu(self.menu, tearoff=0)        
         self.menu.add_cascade(label="Thèmes", menu=theme)
+
+        # sous-menu color
+        color_menu = Menu(self.menu, tearoff=0)
+        self.color = IntVar()
+        self.color.set(1)
+        color_menu.add_radiobutton(label="<Thème par defaut>", variable=self.color, value=1, command=self.change_theme)
+        color_menu.add_separator()
+        color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)
+        color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)
+        color_menu.add_radiobutton(label="orange", variable=self.color, value=4, command=self.change_theme)
+        color_menu.add_radiobutton(label="vert", variable=self.color, value=5, command=self.change_theme)
+        color_menu.add_radiobutton(label="bleu", variable=self.color, value=6, command=self.change_theme)
+        
+        theme.add_cascade(menu=color_menu, label="Modifier le thème")
 
         self.by = StringVar()
         self.nom_cat = StringVar()
@@ -52,20 +63,23 @@ class MainWindow:
             self.tree.delete(prod)
         for produit in get_all():
             self.tree.tag_configure('orow', font=('verdana', 10), background="#fff")
-            self.tree.insert('', 'end', values=produit, tag='orow')
+            self.tree.insert('', 'end', values=produit, tag='orow')            
+    
     
     def create_frame_for_product_list(self):        
         self.colonnes = ("id", "nom", "quantite", "etat_stock", "prix", "id_categorie")     # les colonnes à afficher dans le tableau
         self.frame = Frame(self.root, bd=0, bg="#8080FF")
         self.frame.place(x=0, y=2, width=1278, height=400)
-        Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
+        self.lab_main = Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white")
+        self.lab_main.place(x=5, y=5)
                 
         # champ de recherche        
         search_field = Entry(self.frame, textvariable=self.recherche, font=("verdana", 10))
         search_field.place(x=880, y=5, width=170, height=28)
         
         # label rechercher par
-        Label(self.frame, text="RECHERCHER PAR:", background="#8080FF", fg="white", font=("ms reference sans serif", 10, "bold")).place(x=530, y=10)
+        self.lbl_search = Label(self.frame, text="RECHERCHER PAR:", background="#8080FF", fg="white", font=("ms reference sans serif", 10, "bold"))
+        self.lbl_search.place(x=530, y=10)
 
         # bouton recherche
         btn_search = Button(self.frame, text='Rechercher', width=10, command=self.search)
@@ -320,7 +334,8 @@ class MainWindow:
     def create_frame_for_categorie_list(self):        
         self.frame2 = Frame(self.root, bd=2, background="#8080FF")
         self.frame2.place(x=5, y=415, width=700, height=320)
-        Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white").place(x=5, y=5)
+        self.lbl_cat = Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white")
+        self.lbl_cat.place(x=5, y=5)
         
         # cration du tableau
         self.tree2 = ttk.Treeview(self.frame2, columns=("id", "nom"), show="headings", selectmode='browse')
@@ -385,8 +400,10 @@ class MainWindow:
         Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white").place(x=-1.5, y=-1.5, width=560, height=70)
         
         # CHAMP NOM DE LA CATEGORIE
-        Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF").place(x=200, y=100)
-        Label(self.frame3, text="N° identifiant", font=("ms reference sans serif", 12), bg="#8080FF").place(x=229, y=184)
+        self.lb_name_cat = Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF")
+        self.lb_name_cat.place(x=200, y=100)
+        self.lb_id_cat = Label(self.frame3, text="N° identifiant", font=("ms reference sans serif", 12), bg="#8080FF")
+        self.lb_id_cat.place(x=229, y=184)
         nom = Entry(self.frame3, font=("arial", 11), textvariable=self.nom_cat)
         nom.place(x=150, y=140, width=290, height=32)
         idt = Entry(self.frame3, font=("arial", 11), textvariable=self.id_cat)
@@ -557,6 +574,28 @@ class MainWindow:
     
     def new(self):
         os.popen("main.py")
+    
+    
+    def change_theme(self):
+        theme_value = self.color.get()
+        if theme_value == 1:
+            self.frame["bg"] = "#8080FF"
+            self.lab_main["bg"] = "#8080FF"
+            self.lbl_search["bg"] = "#8080FF"
+            self.frame2["background"] = "#8080FF"
+            self.lbl_cat["bg"] = "#8080FF"
+            self.frame3["background"] = "#8080FF"
+            self.lb_name_cat["bg"] = "#8080FF"
+            self.lb_id_cat["bg"] = "#8080FF"
+        elif theme_value == 2:
+            self.frame["bg"] = "grey"
+            self.lab_main["bg"] = "grey"
+            self.lbl_search["bg"] = "grey"
+            self.frame2["background"] = "grey"
+            self.lbl_cat["bg"] = "grey"
+            self.frame3["background"] = "grey"
+            self.lb_name_cat["bg"] = "grey"
+            self.lb_id_cat["bg"] = "grey"
 
 if __name__ == "__main__":
     window = MainWindow()
