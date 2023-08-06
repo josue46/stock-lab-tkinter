@@ -24,7 +24,7 @@ class MainWindow:
         file.add_command(label="Bureau de change", command=self.conversion)
         file.add_separator()
         file.add_command(label="Quitter", command=quit)
-        self.menu.add_cascade(label="Fichier", menu=file)
+        self.menu.add_cascade(label="Fichier", menu=file)        
 
         # sous-menu thème
         theme = Menu(self.menu, tearoff=0)        
@@ -40,6 +40,11 @@ class MainWindow:
         color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)        
         
         theme.add_cascade(menu=color_menu, label="Modifier le thème")
+        
+        # sous-menu aide
+        aide = Menu(self.menu, tearoff=0)
+        aide.add_command(label="À propos", command='self.about')
+        self.menu.add_cascade(label="Aide", menu=aide)
 
         self.by = StringVar()
         self.nom_cat = StringVar()
