@@ -37,10 +37,7 @@ class MainWindow:
         color_menu.add_radiobutton(label="<Thème par defaut>", variable=self.color, value=1, command=self.change_theme)
         color_menu.add_separator()
         color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)
-        color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)
-        color_menu.add_radiobutton(label="orange", variable=self.color, value=4, command=self.change_theme)
-        color_menu.add_radiobutton(label="vert", variable=self.color, value=5, command=self.change_theme)
-        color_menu.add_radiobutton(label="bleu", variable=self.color, value=6, command=self.change_theme)
+        color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)        
         
         theme.add_cascade(menu=color_menu, label="Modifier le thème")
 
@@ -578,24 +575,34 @@ class MainWindow:
     
     def change_theme(self):
         theme_value = self.color.get()
-        if theme_value == 1:
-            self.frame["bg"] = "#8080FF"
-            self.lab_main["bg"] = "#8080FF"
-            self.lbl_search["bg"] = "#8080FF"
-            self.frame2["background"] = "#8080FF"
-            self.lbl_cat["bg"] = "#8080FF"
-            self.frame3["background"] = "#8080FF"
-            self.lb_name_cat["bg"] = "#8080FF"
-            self.lb_id_cat["bg"] = "#8080FF"
-        elif theme_value == 2:
-            self.frame["bg"] = "grey"
-            self.lab_main["bg"] = "grey"
-            self.lbl_search["bg"] = "grey"
-            self.frame2["background"] = "grey"
-            self.lbl_cat["bg"] = "grey"
-            self.frame3["background"] = "grey"
-            self.lb_name_cat["bg"] = "grey"
-            self.lb_id_cat["bg"] = "grey"
+        match (theme_value):                            
+            case(2):
+                self.frame["bg"] = "grey"
+                self.lab_main["bg"] = "grey"
+                self.lbl_search["bg"] = "grey"
+                self.frame2["background"] = "grey"
+                self.lbl_cat["bg"] = "grey"
+                self.frame3["background"] = "grey"
+                self.lb_name_cat["bg"] = "grey"
+                self.lb_id_cat["bg"] = "grey"
+            case(3):
+                self.frame["bg"] = "purple"
+                self.lab_main["bg"] = "purple"
+                self.lbl_search["bg"] = "purple"
+                self.frame2["background"] = "purple"
+                self.lbl_cat["bg"] = "purple"
+                self.frame3["background"] = "purple"
+                self.lb_name_cat["bg"] = "purple"
+                self.lb_id_cat["bg"] = "purple"
+            case _:
+                self.frame["bg"] = "#8080FF"
+                self.lab_main["bg"] = "#8080FF"
+                self.lbl_search["bg"] = "#8080FF"
+                self.frame2["background"] = "#8080FF"
+                self.lbl_cat["bg"] = "#8080FF"
+                self.frame3["background"] = "#8080FF"
+                self.lb_name_cat["bg"] = "#8080FF"
+                self.lb_id_cat["bg"] = "#8080FF"
 
 if __name__ == "__main__":
     window = MainWindow()
