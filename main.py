@@ -14,7 +14,7 @@ class MainWindow:
     def __init__(self):
         self.root = Tk()        
         self.root.wm_state(newstate="zoomed")
-        self.root.title("Stock Lab")
+        self.root.title("StockLab")
         self.root.iconbitmap("icon/icone.ico")
         self.menu = Menu(self.root)
         self.root.config(background="#23222e", menu=self.menu)
@@ -48,7 +48,7 @@ class MainWindow:
         
         # sous-menu aide
         aide = Menu(self.menu, tearoff=0)
-        aide.add_command(label="À propos", command='self.about')
+        aide.add_command(label="À propos de StockLab", command=self.about)
         self.menu.add_cascade(label="Aide", menu=aide)
 
         self.by = StringVar()
@@ -689,6 +689,9 @@ class MainWindow:
                 self.frame3["background"] = "#8080FF"
                 self.lb_name_cat["bg"] = "#8080FF"
                 self.lb_id_cat["bg"] = "#8080FF"
+    
+    def about(self):        
+        showinfo("À propos de StockLab", "StockLab", detail="\r\nVersion: 2.3.14\r\nAuteur: Josué Luis Panzu\r\nDescription: Stock Lab est une application de gestion de stockage\r\nSystème: Windows x64 Linux MacOS\r\n\nCopyright (C) 2023 Walborn Inc.")
                 
 if __name__ == "__main__":
     window = MainWindow()
