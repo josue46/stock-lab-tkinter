@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
 import sqlite3 as sq
+
 from src.categorie import Categories
 import sys
 import os
@@ -608,7 +609,7 @@ class MainWindow:
                 self.frame3["background"] = "#8080FF"
                 self.lb_name_cat["bg"] = "#8080FF"
                 self.lb_id_cat["bg"] = "#8080FF"
-
+                
 if __name__ == "__main__":
     window = MainWindow()
     window.root.mainloop()
