@@ -33,7 +33,7 @@ class MainWindow:
 
         # sous-menu thème
         theme = Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Thèmes", menu=theme)
+        self.menu.add_cascade(label="Option", menu=theme)
 
         # sous-menu color
         color_menu = Menu(self.menu, tearoff=0)
@@ -44,7 +44,7 @@ class MainWindow:
         color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)
         color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)        
         
-        theme.add_cascade(menu=color_menu, label="Modifier le thème")
+        theme.add_cascade(menu=color_menu, label="Thème")
         
         # sous-menu aide
         aide = Menu(self.menu, tearoff=0)
