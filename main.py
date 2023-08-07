@@ -340,7 +340,7 @@ class MainWindow:
                 
     def create_frame_for_categorie_list(self):        
         self.frame2 = Frame(self.root, bd=2, background="#8080FF")
-        self.frame2.place(x=5, y=415, width=700, height=320)
+        self.frame2.place(x=0, y=404, width=705, height=320)
         self.lbl_cat = Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white")
         self.lbl_cat.place(x=5, y=5)
         
@@ -360,9 +360,9 @@ class MainWindow:
 
         # BOUTON DELETE ET UPDATE
         self.btn_sup = Button(self.frame2, text="Supprimer la catégorie", bg='#333', fg='#fff',command=self.delete_cat)    
-        self.btn_sup.place(x=160, y=280, width=150, height=33)
+        self.btn_sup.place(x=160, y=275, width=150, height=30)
         self.btn_modif = Button(self.frame2, text="Modifier la catégorie", command=self.update_cat)
-        self.btn_modif.place(x=330, y=280, width=150, height=33)        
+        self.btn_modif.place(x=330, y=275, width=150, height=30)        
         
         # affichage des catégories dans le tableau
         for c in self.tree2.get_children():
@@ -403,8 +403,8 @@ class MainWindow:
         
     def create_frame_for_adding_categorie(self):
         self.frame3 = Frame(self.root, bd=2, background="#8080FF")
-        self.frame3.place(x=710, y=415, width=560, height=320)
-        Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white").place(x=-1.5, y=-1.5, width=560, height=70)
+        self.frame3.place(x=708, y=404, width=571, height=320)
+        Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white").place(x=-1.5, y=-1.5, width=571, height=70)
         
         # CHAMP NOM DE LA CATEGORIE
         self.lb_name_cat = Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF")
@@ -416,7 +416,7 @@ class MainWindow:
         idt = Entry(self.frame3, font=("arial", 11), textvariable=self.id_cat)
         idt.place(x=150, y=220, width=290, height=32)
         btn_add_cat = Button(self.frame3, text="Ajouter la catégorie", font=("ms reference sans serif", 11), command=self.create_cat)
-        btn_add_cat.place(x=170, y=275, width=250, height=32)
+        btn_add_cat.place(x=170, y=270, width=250, height=32)
     
                 
     def delete_cat(self):
