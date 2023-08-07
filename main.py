@@ -21,14 +21,18 @@ class MainWindow:
 
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
-        file.add_command(label="Nouvelle fenêtre", command=self.new)
-        file.add_command(label="Bureau de change", command=self.conversion)
+        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+N")
+        file.add_command(label="Bureau de change", command=self.conversion, accelerator="Ctrl+B")
         file.add_separator()
         file.add_command(label="Quitter", command=quit)
-        self.menu.add_cascade(label="Fichier", menu=file)        
+        self.menu.add_cascade(label="Fichier", menu=file)
+        self.root.bind_all("<Control-KeyPress-n>", self.new_bind)
+        self.root.bind_all("<Control-KeyPress-N>", self.new_bind)
+        self.root.bind_all("<Control-KeyPress-b>", self.conversion_bind)
+        self.root.bind_all("<Control-KeyPress-B>", self.conversion_bind)
 
         # sous-menu thème
-        theme = Menu(self.menu, tearoff=0)        
+        theme = Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Thèmes", menu=theme)
 
         # sous-menu color
@@ -503,7 +507,80 @@ class MainWindow:
     
 
     def conversion(self):
-        self.c = Toplevel(self.root)
+        self.c = Toplevel()
+        self.c.title("Convertissez votre monnaie")
+        self.c.geometry("340x410+380+160")
+        self.c.iconbitmap("icon/icone.ico")        
+        self.cframe = Frame(self.c, bg='#0a0b38')
+        self.cframe.place(x=0, y=0, width=340, height=410)
+        self.e2 = StringVar()
+
+        Label(self.cframe, text="Devise", font=("verdana", 12), bg='#0a0b38', fg='#fff').place(x=0, y=10)
+        self.devise = ttk.Combobox(self.cframe, values=("franc", "dollar"), state='readonly')
+        self.devise.place(x=60, y=12, width=60)
+        self.devise.current(1)
+
+        Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=100)
+        self.entree1 = Entry(self.cframe, font=("verdana", 11))
+        self.entree1.place(x=50, y=130, width=240, height=25)
+
+        Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
+        self.entree2 = Entry(self.cframe, textvariable=self.e2, font=("verdana", 11))
+        self.entree2.place(x=50, y=240, width=240, height=25)
+        Label(self.cframe, text="Taux= 2465", font=("sans serif", 8), bg='#0a0b38', fg='#fff').place(x=50, y=280)
+
+        def convert_b(event):
+            e1 = self.entree1.get()
+            taux = 2465
+            r = None
+
+            match(self.devise.get()):
+                case('franc'):
+                    if e1 != '':
+                        r = int(float(e1)) / taux
+                        self.e2.set(f'{r} $')
+                    else:
+                        showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                case('dollar'):
+                    if e1 != '':
+                        r = int(float(e1)) * taux
+                        self.e2.set(f'{r} fc')
+                    else:
+                        showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)                    
+                case _:
+                    showinfo('', 'Choississez une devise', parent=self.c)
+
+        def convert():
+            e1 = self.entree1.get()
+            r = None
+            taux = 2465
+
+            match(self.devise.get()):
+                case('franc'):
+                    if r is None:
+                        if e1 != "":
+                            r = int(float(e1)) / taux
+                            self.e2.set(f'{r} $')
+                        else:
+                            showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                case('dollar'):
+                    if r is None:
+                        if e1 != '':
+                            r = int(float(e1)) * taux
+                            self.e2.set(f'{r} fc')
+                        else:
+                            showinfo('', 'Mettez un montant dans le premier champ de saisi', parent=self.c)
+                    # Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#000', fg='#fff').place(x=100, y=100)
+                    # Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#333', fg='#fff').place(x=100, y=210)
+                case _:
+                    showinfo('', 'Choississez une devise', parent=self.c)
+
+        self.c.bind("<Return>", convert_b)
+        Button(self.c, text="Convertir", font=("arial", 14), bg='#3af076', command=convert).place(x=50, y=340, width=240)
+    
+    
+    def conversion_bind(self, event):
+        self.c = Toplevel()
         self.c.title("Convertissez votre monnaie")
         self.c.geometry("340x410+380+160")
         self.c.iconbitmap("icon/icone.ico")        
@@ -576,6 +653,9 @@ class MainWindow:
     
     
     def new(self):
+        os.popen("main.py")
+    
+    def new_bind(self, event):
         os.popen("main.py")
     
     
