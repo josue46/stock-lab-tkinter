@@ -157,6 +157,7 @@ class MainWindow:
         label1 = Label(self.win_sup, text="N° Identifiant", font=("ms reference sans serif", 12), bg='#0a0b38', fg="#ffffff")
         label1.place(x=40, y=200)
         sup_entry = Entry(self.win_sup, textvariable=self.id_prod, bd=1, font=("verdana", 10))
+        sup_entry.focus()
         sup_entry.place(x=180, y=200, width=240, height=28)
         
         
@@ -167,7 +168,7 @@ class MainWindow:
     
     def delete(self):
         if str(self.id_prod.get()) == "" or str(self.id_prod.get()) == " ":
-            showwarning('Attention', "Le champ n° identifiant est requis pour supprimer", parent=self.win_sup)
+            showwarning('Attention', "Le champ n° identifiant est requis pour supprimer un produit", parent=self.win_sup)
         else:
             res = askyesno("Notice", "Vous êtes entrain de supprimer ce produit. Voulez-vous continuer ?", parent=self.win_sup)
             if res:                
@@ -186,8 +187,7 @@ class MainWindow:
         self.win_create.iconbitmap("icon/icone.ico")
         self.win_create.resizable(False, False)
         self.win_create.config(background="#0a0b38")
-
-        #121246        
+        
         lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#49ca74", font=("century gothic", 20))
         lable_principal.place(x=0, y=0, width=560, height=90)
 
@@ -195,13 +195,14 @@ class MainWindow:
         label1 = Label(self.win_create, text="Nom:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label1.place(x=40, y=120)
         name_entry = Entry(self.win_create, textvariable=self.name_prod, bd=1, font=("verdana", 10))
+        name_entry.focus()
         name_entry.place(x=180, y=120, width=240, height=28)
         
         label2 = Label(self.win_create, text="Quantité:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label2.place(x=40, y=170)
         quantity_entry = Entry(self.win_create, textvariable=self.quantity, bd=1, font=("verdana", 10))
         quantity_entry.place(x=180, y=170, width=240, height=28)
-        
+
         label3 = Label(self.win_create, text="Prix:", font=("ms reference sans serif", 12), bg='#0a0b38', fg='#fff')
         label3.place(x=40, y=214)
         price_entry = Entry(self.win_create, textvariable=self.price, bd=0, font=("verdana", 10))
@@ -294,6 +295,7 @@ class MainWindow:
         label6 = Label(self.win_update, text="N° identifiant:", font=("ms reference sans serif", 12), bg='#0a0b38', fg="#fff")
         label6.place(x=40, y=350)
         id_entry = Entry(self.win_update, textvariable=self.id_prod, font=("verdana", 10))
+        id_entry.focus()
         id_entry.place(x=180, y=350, width=240, height=28)
         
         
@@ -413,6 +415,7 @@ class MainWindow:
         self.lb_id_cat.place(x=229, y=184)
         nom = Entry(self.frame3, font=("arial", 11), textvariable=self.nom_cat)
         nom.place(x=150, y=140, width=290, height=32)
+        nom.focus()
         idt = Entry(self.frame3, font=("arial", 11), textvariable=self.id_cat)
         idt.place(x=150, y=220, width=290, height=32)
         btn_add_cat = Button(self.frame3, text="Ajouter la catégorie", font=("ms reference sans serif", 11), command=self.create_cat)
@@ -595,6 +598,7 @@ class MainWindow:
 
         Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=100)
         self.entree1 = Entry(self.cframe, font=("verdana", 11))
+        self.entree1.focus()
         self.entree1.place(x=50, y=130, width=240, height=25)
 
         Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
