@@ -525,6 +525,7 @@ class MainWindow:
 
         Label(self.c, text='Montant', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=100)
         self.entree1 = Entry(self.cframe, font=("verdana", 11))
+        self.entree1.focus()
         self.entree1.place(x=50, y=130, width=240, height=25)
 
         Label(self.c, text='Resultat', font=("ms reference sans serif", 11), bg='#0a0b38', fg='#fff').place(x=135, y=210)
