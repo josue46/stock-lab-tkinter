@@ -695,8 +695,8 @@ class MainWindow:
                 self.lb_name_cat["bg"] = "#8080FF"
                 self.lb_id_cat["bg"] = "#8080FF"
     
-    def about(self):        
-        showinfo("À propos de StockLab", "StockLab", detail="\r\nVersion: 2.3.14\r\nAuteur: Josué Luis Panzu\r\nDescription: Stock Lab est une application de gestion de stockage\r\nSystème: Windows x64 Linux MacOS\r\n\nCopyright © 2023 Walborn Inc.")
+    def about(self):
+        showinfo("À propos de StockLab", "StockLab", detail="\r\nVersion: 2.3.14\r\nAuteur: Josué Luis Panzu\r\nDescription: Stock Lab est une application open source de gestion de stockage\r\nSystème: Windows x64 Linux MacOS\r\n\nCopyright © 2023 Walborn Inc.")
         
         
 if __name__ == "__main__":
