@@ -21,13 +21,13 @@ class MainWindow:
 
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
-        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+N")
+        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+Shift+N")
         file.add_command(label="Bureau de change", command=self.conversion, accelerator="Ctrl+B")
         file.add_separator()
         file.add_command(label="Quitter", command=quit)
         self.menu.add_cascade(label="Fichier", menu=file)
-        self.root.bind_all("<Control-KeyPress-n>", self.new_bind)
-        self.root.bind_all("<Control-KeyPress-N>", self.new_bind)
+        self.root.bind_all("<Control-Shift-KeyPress-n>", self.new_bind)
+        self.root.bind_all("<Control-Shift-KeyPress-N>", self.new_bind)
         self.root.bind_all("<Control-KeyPress-b>", self.conversion_bind)
         self.root.bind_all("<Control-KeyPress-B>", self.conversion_bind)
 
