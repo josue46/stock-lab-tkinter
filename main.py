@@ -21,8 +21,10 @@ class MainWindow:
 
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
-        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+Shift+N")
         file.add_command(label="Bureau de change", command=self.conversion, accelerator="Ctrl+B")
+        file.add_separator()
+        file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+Shift+N")
+        file.add_command(label="Fermer la fenêtre", command=self.root.destroy, accelerator="Ctrl+Shift+W")
         file.add_separator()
         file.add_command(label="Quitter", command=quit)
         self.menu.add_cascade(label="Fichier", menu=file)
@@ -30,6 +32,8 @@ class MainWindow:
         self.root.bind_all("<Control-Shift-KeyPress-N>", self.new_bind)
         self.root.bind_all("<Control-KeyPress-b>", self.conversion_bind)
         self.root.bind_all("<Control-KeyPress-B>", self.conversion_bind)
+        self.root.bind_all("<Control-Shift-KeyPress-W>", self.close)
+        self.root.bind_all("<Control-Shift-KeyPress-w>", self.close)
 
         # sous-menu thème
         theme = Menu(self.menu, tearoff=0)
@@ -697,6 +701,9 @@ class MainWindow:
     
     def about(self):
         showinfo("À propos de StockLab", "StockLab", detail="\r\nVersion: 2.3.14\r\nAuteur: Josué Luis Panzu\r\nDescription: Stock Lab est une application open source de gestion de stockage\r\nSystème: Windows x64 Linux MacOS\r\n\nCopyright © 2023 Walborn Inc.")
+
+    def close(self, e):
+        self.root.destroy()
         
         
 if __name__ == "__main__":
