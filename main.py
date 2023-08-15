@@ -45,8 +45,9 @@ class MainWindow:
         self.color.set(1)
         color_menu.add_radiobutton(label="<Thème par defaut>", variable=self.color, value=1, command=self.change_theme)
         color_menu.add_separator()
-        color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)
+        color_menu.add_radiobutton(label="gris", variable=self.color, value=2, command=self.change_theme)    
         color_menu.add_radiobutton(label="violet", variable=self.color, value=3, command=self.change_theme)        
+        color_menu.add_radiobutton(label="vert", variable=self.color, value=4, command=self.change_theme)
         
         theme.add_cascade(menu=color_menu, label="Thème")
         
@@ -410,7 +411,8 @@ class MainWindow:
     def create_frame_for_adding_categorie(self):
         self.frame3 = Frame(self.root, bd=2, background="#8080FF")
         self.frame3.place(x=708, y=404, width=571, height=320)
-        Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white").place(x=-1.5, y=-1.5, width=571, height=70)
+        self.lbl_add_cat = Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white")
+        self.lbl_add_cat.place(x=-1.5, y=-1.5, width=571, height=70)
         
         # CHAMP NOM DE LA CATEGORIE
         self.lb_name_cat = Label(self.frame3, text="Nom de la catégorie", font=("ms reference sans serif", 12), bg="#8080FF")
@@ -689,6 +691,15 @@ class MainWindow:
                 self.frame3["background"] = "purple"
                 self.lb_name_cat["bg"] = "purple"
                 self.lb_id_cat["bg"] = "purple"
+            case(4):
+                self.frame["bg"] = "#04805a"
+                self.lab_main["bg"] = "#04805a"
+                self.lbl_search["bg"] = "#04805a"
+                self.frame2["background"] = "#04805a"
+                self.lbl_cat["bg"] = "#04805a"
+                self.frame3["background"] = "#04805a"
+                self.lb_name_cat["bg"] = "#04805a"
+                self.lb_id_cat["bg"] = "#04805a"                
             case _:
                 self.frame["bg"] = "#8080FF"
                 self.lab_main["bg"] = "#8080FF"
