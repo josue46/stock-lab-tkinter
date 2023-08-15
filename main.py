@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
+from tkinter.font import Font
 import sqlite3 as sq
 
 from src.categorie import Categories
@@ -18,6 +19,9 @@ class MainWindow:
         self.root.iconbitmap("icon/icone.ico")
         self.menu = Menu(self.root)
         self.root.config(background="#23222e", menu=self.menu)
+
+        # police
+        self.police_header = Font(family="Sitka Heading", size=18, weight="bold")
 
         # sous-menu fichier
         file = Menu(self.menu, tearoff=0)
@@ -78,11 +82,11 @@ class MainWindow:
             self.tree.insert('', 'end', values=produit, tag='orow')            
     
     
-    def create_frame_for_product_list(self):        
+    def create_frame_for_product_list(self):
         self.colonnes = ("id", "nom", "quantite", "etat_stock", "prix", "id_categorie")     # les colonnes à afficher dans le tableau
         self.frame = Frame(self.root, bd=0, bg="#8080FF")
-        self.frame.place(x=0, y=2, width=1278, height=400)
-        self.lab_main = Label(self.frame, text="TABLEAU DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white")
+        self.frame.place(x=0, y=2, width=1278, height=400)        
+        self.lab_main = Label(self.frame, text="TABLEAU DES PRODUITS", font=self.police_header, bg="#8080FF", fg="white")
         self.lab_main.place(x=5, y=5)
                 
         # champ de recherche        
@@ -155,7 +159,7 @@ class MainWindow:
         self.win_sup.resizable(False, False)
         self.win_sup.config(background="#0a0b38")
         
-        lable_principal = Label(self.win_sup, text="Suppression des produits", fg="#fff", bg="#b60d2a", font=("consolas", 18))
+        lable_principal = Label(self.win_sup, text="Suppression des produits", fg="#fff", bg="#b60d2a", font=self.police_header)
         lable_principal.place(x=0, y=0, width=500, height=90)
 
         # LABEL POUR L'IDENTIFIANT DU PRODUIT
@@ -193,7 +197,7 @@ class MainWindow:
         self.win_create.resizable(False, False)
         self.win_create.config(background="#0a0b38")
         
-        lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#49ca74", font=("century gothic", 20))
+        lable_principal = Label(self.win_create, text="Enrégistrement des produits", fg="#fff", bg="#49ca74", font=self.police_header)
         lable_principal.place(x=0, y=0, width=560, height=90)
 
         # LABEL POUR LES DONNEES DU PRODUIT
@@ -263,7 +267,7 @@ class MainWindow:
         self.win_update.resizable(False, False)
         self.win_update.config(background="#0a0b38")
         
-        lable_principal = Label(self.win_update, text="Mise à jour des produits", fg="#fff", bg="#1c9be4", font=("consolas", 18))
+        lable_principal = Label(self.win_update, text="Mise à jour des produits", fg="#fff", bg="#1c9be4", font=self.police_header)
         lable_principal.place(x=0, y=0, width=560, height=90)
 
         # LABEL POUR LES DONNEES DU PRODUIT
@@ -348,7 +352,7 @@ class MainWindow:
     def create_frame_for_categorie_list(self):        
         self.frame2 = Frame(self.root, bd=2, background="#8080FF")
         self.frame2.place(x=0, y=404, width=705, height=320)
-        self.lbl_cat = Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=("consolas", 16), bg="#8080FF", fg="white")
+        self.lbl_cat = Label(self.frame2, text="TABLEAU DES CATEGORIES DES PRODUITS", font=self.police_header, bg="#8080FF", fg="white")
         self.lbl_cat.place(x=5, y=5)
         
         # cration du tableau
@@ -411,7 +415,7 @@ class MainWindow:
     def create_frame_for_adding_categorie(self):
         self.frame3 = Frame(self.root, bd=2, background="#8080FF")
         self.frame3.place(x=708, y=404, width=571, height=320)
-        self.lbl_add_cat = Label(self.frame3, text="AJOUT DES CATEGORIES", font=("consolas", 16), bg="#000", fg="white")
+        self.lbl_add_cat = Label(self.frame3, text="AJOUT DES CATEGORIES", font=self.police_header, bg="#000", fg="white")
         self.lbl_add_cat.place(x=-1.5, y=-1.5, width=571, height=70)
         
         # CHAMP NOM DE LA CATEGORIE
