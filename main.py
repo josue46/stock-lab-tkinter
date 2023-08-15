@@ -3,10 +3,10 @@ from tkinter import ttk
 from tkinter.messagebox import showinfo, showwarning, showerror, askyesno
 from tkinter.font import Font
 
-from src.categorie import Categories
+from models.categorie import Categories
 import os
 
-from src.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
+from models.product import delete_product, get_all, register_product, search_product_by_categorie, search_product_by_name, update_product
 from xlsw import inventory_excel_file
 
 class MainWindow:
