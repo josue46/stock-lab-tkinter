@@ -26,7 +26,7 @@ class MainWindow:
         file.add_command(label="Nouvelle fenêtre", command=self.new, accelerator="Ctrl+Shift+N")
         file.add_command(label="Fermer la fenêtre", command=self.root.destroy, accelerator="Ctrl+Shift+W")
         file.add_separator()
-        file.add_command(label="Quitter", command=quit)
+        file.add_command(label="Quitter", command=self.root.quit)
         self.menu.add_cascade(label="Fichier", menu=file)
         self.root.bind_all("<Control-Shift-KeyPress-n>", self.new_bind)
         self.root.bind_all("<Control-Shift-KeyPress-N>", self.new_bind)
