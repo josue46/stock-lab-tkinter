@@ -55,4 +55,4 @@ def inventory_excel_file():
             showinfo("Téléchargement réussi", "Le fichier excel a été téléchargé dans le dossier actuel")
     else:
         # si téléchargement échoué, envoyer ce message
-        showwarning("Téléchargement échoué", "Aucune donnée n'a été téléchargé car le tableau des produits est vide")
+        showwarning("Téléchargement échoué", "Aucune donnée n'a été téléchargée car le tableau des produits est vide")
