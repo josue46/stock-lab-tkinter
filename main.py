@@ -670,7 +670,7 @@ class MainWindow:
     
     def change_theme(self):
         theme_value = self.color.get()
-        match (theme_value):                            
+        match (theme_value):    
             case(2):
                 self.frame["bg"] = "grey"
                 self.lab_main["bg"] = "grey"
