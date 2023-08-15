@@ -1,7 +1,7 @@
 import locale
 import xlsxwriter as xls
-from src.product import get_all
-from src.categorie import Categories
+from models.product import get_all
+from models.categorie import Categories
 from datetime import datetime
 from tkinter.messagebox import showinfo, showwarning
 
